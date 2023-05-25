@@ -5,6 +5,8 @@ import {Barcode, Box, Box1, Category, Cd, FormatSquare, Grid8, Hashtag, HashtagS
 
 import Stepper from '@keyvaluesystems/react-vertical-stepper';
 
+import GraphicHistory from "../partials/paletization/GraphicHistory";
+
 function GenealogyDashboard() {
 
     const [currentStepIndex, setCurrentStepIndex] = useState(1);
@@ -367,12 +369,7 @@ function GenealogyDashboard() {
                         Historial
                         </h3>
                        <div className="flex grid justify-start" style={{marginLeft: "-10px"}}>
-                       <Stepper
-                            className='!ml-0'
-                            steps={stepsArray}
-                            currentStepIndex={currentStepIndex}
-                            styles={stylesOverride}
-                        />
+                       <GraphicHistory/>
                         <div></div>
                        </div>
                     </div>
