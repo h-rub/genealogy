@@ -7,7 +7,15 @@ import Stepper from '@keyvaluesystems/react-vertical-stepper';
 
 import GraphicHistory from "../partials/paletization/GraphicHistory";
 
+import useScanDetection from 'use-scan-detection';
+
 function GenealogyDashboard() {
+
+    const [barcodeProduct, setBarcodeProduct] = useState("No barcode")
+
+    useScanDetection({
+        onComplete: (code) => { console.log(code); setBarcodeProduct(code) }
+    });
 
     const [currentStepIndex, setCurrentStepIndex] = useState(1);
 
@@ -153,6 +161,25 @@ function GenealogyDashboard() {
                         <div className='sm:flex sm:items-start bg-white'>
                             <div className='bg-white text-center sm:mt-0 sm:ml-2 sm:text-left'>
                                 <div className='flex items-center'>
+                                    <Category className="mr-2" color="#A0A2A6" size={20} />
+                                    <h3 className='bg-white text-md font-medium text-gray'>
+                                    Número serial actual
+                                    </h3>
+                                </div>
+                               
+                                <p className='bg-white text-3xl font-bold text-black'>
+                                {barcodeProduct}
+                                </p>
+                            </div>
+                            </div>
+                        </div>
+                </section>
+
+                <section className='inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4'>
+                    <div className='bg-white p-5'>
+                        <div className='sm:flex sm:items-start bg-white'>
+                            <div className='bg-white text-center sm:mt-0 sm:ml-2 sm:text-left'>
+                                <div className='flex items-center'>
                                     <Box1 variant="Outline" className="mr-2" color="#A0A2A6" size={20} />
                                     <h3 className='bg-white text-md font-medium text-gray'>
                                     Producto
@@ -186,24 +213,7 @@ function GenealogyDashboard() {
                         </div>
                 </section>
 
-                <section className='inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4'>
-                    <div className='bg-white p-5'>
-                        <div className='sm:flex sm:items-start bg-white'>
-                            <div className='bg-white text-center sm:mt-0 sm:ml-2 sm:text-left'>
-                                <div className='flex items-center'>
-                                    <Category className="mr-2" color="#A0A2A6" size={20} />
-                                    <h3 className='bg-white text-md font-medium text-gray'>
-                                    Número de lote actual
-                                    </h3>
-                                </div>
-                               
-                                <p className='bg-white text-3xl font-bold text-black'>
-                                3000
-                                </p>
-                            </div>
-                            </div>
-                        </div>
-                </section>
+                
 
                 
             </div>
