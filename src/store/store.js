@@ -1,5 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authSlice from './slice/authSlice';
+import openOrdersSlice from './slice/ordersSlice.js';
+import orderSelectedSlice from './slice/orderSelectedSlice';
+import eventsLogSlice from './slice/eventsLogSlice';
+import testResultsSlice from './slice/testResultSlice';
 // import usersSlice from './slice/usersSlice';
 // import BaseCapabilitiesSlice from './slice/BaseCapabilitiesSlice';
 // import LineRateCustomSlice from './slice/LineRateCustomSlice';
@@ -16,6 +20,10 @@ import authSlice from './slice/authSlice';
 const store = configureStore({
   reducer: {
     auth: authSlice,
+    openOrders: openOrdersSlice,
+    orderSelected: orderSelectedSlice,
+    eventsLog: eventsLogSlice,
+    testResults: testResultsSlice,
     // users: usersSlice,
     // group: BaseCapabilitiesSlice,
     // calendar: calendarSlice,
