@@ -53,7 +53,7 @@ export const getOpenOrdersList = () => (dispatch) => {
     // };
     // dispatch(addEvent(startFetchOrders));
     axios
-      .get('http://23.100.25.47:8000/api/v1/orders')
+      .get('http://127.0.0.1:8001/api/v1/orders')
       .then((response) => {
         if (response.status === 200) {
           //dispatch(setLoading(false));
