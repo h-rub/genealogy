@@ -42,7 +42,7 @@ export const getTestResults = (barcode) => (dispatch) => {
     // };
     // dispatch(addEvent(startFetchOrders));
     axios
-      .get('http://127.0.0.1:8001/api/v1/test-result?barcode='+barcode)
+      .get('http://em10vs0010.embraco.com:8001/api/v1/test-result?barcode='+barcode)
       .then((response) => {
         if (response.status === 200) {
           //dispatch(setLoading(false));
