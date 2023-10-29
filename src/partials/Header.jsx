@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import icons from "../assets/icons/icons";
 // import Help from "../components/DropdownHelp";
 import UserMenu from "../components/DropdownProfile";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Add, Grid2, Note, Notepad2 } from "iconsax-react";
+import { Add, Barcode, Grid2, Grid8, Note, Notepad2 } from "iconsax-react";
 
 import { selectOpenOrdersList } from "../store/slice/ordersSlice";
 
@@ -43,13 +43,20 @@ function Header({
             />
             <div className="bg-black flex flex-grow justify-between">
               <div className="flex bg-black my-auto">
-                <a
-                  href="#"
-                  className="flex bg-black hover:text-hoverTextSidebar transition duration-500 easy-in-out text-hoverTextSidebar font-semibold lg:mr-7 "
+                <Link
+                  to="/genealogy"
+                  className={`flex bg-black hover:text-hoverTextSidebar transition duration-500 easy-in-out ${location.pathname === '/genealogy' ? 'text-hoverTextSidebar' : 'text-white'} font-semibold lg:mr-7`}
                 >
-                  <Grid2 className="bg-black mr-2" color="#ffff" size={24} />{" "}
-                  Dashboard
-                </a>
+                  <Barcode className="bg-black mr-2" color="#ffff" size={24} />{" "}
+                  Genealogía
+                </Link>
+                <Link
+                  to="/paletization"
+                  className={`flex bg-black hover:text-hoverTextSidebar transition duration-500 easy-in-out ${location.pathname === '/paletization' ? 'text-hoverTextSidebar' : 'text-white'} font-semibold lg:mr-7`}
+                >
+                  <Grid8 className="bg-black mr-2" color="#ffff" size={24} />{" "}
+                  Paletización
+                </Link>
                 <button onClick={handleClick}>
                   <a
                     href="#"

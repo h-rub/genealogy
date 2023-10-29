@@ -43,7 +43,7 @@ export const getMetadataFromOrder = (idMaterial) => (dispatch) => {
     .then((response) => {
       if (response.status === 200) {
         //dispatch(setLoading(false));
-        const desiredCaractIDs = [151, 119, 3, 4, 119, 118, 1, 120, 181, 115];
+        const desiredCaractIDs = [151, 119, 3, 4, 119, 118, 1, 120, 181, 115, 185];
         const selecteCaract = response.data.filter(obj => desiredCaractIDs.includes(obj.ID_CARACTMATERIAL));
         console.log(selecteCaract)
         dispatch(setMetadataOrderSelected(selecteCaract));

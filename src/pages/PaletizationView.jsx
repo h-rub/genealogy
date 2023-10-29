@@ -38,7 +38,7 @@ import {
 } from "../store/slice/testResultSlice";
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
 
-function GenealogyDashboard() {
+function PaletizationView() {
   const testResultsList = useSelector(selectTestResults);
   const globalStatus = useSelector(selectGlobalStatus);
   const orderSelected = useSelector(selectOrderSelected);
@@ -226,160 +226,206 @@ function GenealogyDashboard() {
 
   return (
     <>
-      <div className="mt-6 px-4 sm:px-6 lg:px-8 py-2 w-full max-w-9xl mx-auto">
-        <header>
-          <div className="sm:px-4 lg:px-4">
-            <div className="flex items-center justify-between h-16 -mb-px">
-              <h3 className="text-black text-2xl capitalize font-semibold text-gray-400 tracking-tight">
-                Genealogía
-              </h3>
-              {/* Header: Right side */}
-              <div className="flex items-center space-x-3">
-                <button className="border border-slate-300 rounded w-64 h-12 text-base flex justify-center font-semibold mr-2">
-                  <Scan
-                    className="mr-2 my-auto ml-4 bg-transparent"
-                    color="black"
-                    size={20}
-                  />
-                  <span className="my-auto text-black font-semibold">
-                    Escanear producto
-                  </span>
-                </button>
+      <div className="px-4 sm:px-6 lg:px-8 py-2 w-full max-w-9xl mx-auto">
+        <div className="max-w-full mx-4 py-0 sm:mx-auto sm:px-6 lg:px-4">
+          <header>
+            <div className="mt-8">
+              <div className="flex items-center justify-between h-16 -mb-px">
+                <h3 className="text-black text-2xl capitalize font-semibold text-gray-400 tracking-tight">
+                  Paletización
+                </h3>
+                {/* Header: Right side */}
+                <div className="flex items-center space-x-3">
+                  <button className="border border-slate-300 rounded w-64 h-12 text-base flex justify-center font-semibold mr-2">
+                    <span className="my-auto text-black font-semibold">
+                      Re-procesamiento
+                    </span>
+                  </button>
 
-                <ReactToPrint
-                  trigger={() => (
-                    <button
-                      onClick={(e) => {}}
-                      className={
-                        globalStatus === 1
-                          ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
-                          : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
-                      }
-                      disabled={globalStatus !== 1}
-                    >
-                      <Barcode
-                        className="mr-2 my-auto ml-4 bg-transparent"
-                        color="#ffff"
-                        size={20}
-                      />
-                      <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
-                        Imprimir etiqueta
-                      </span>
-                    </button>
-                  )}
-                  content={() => labelRef.current}
-                />
-
-                <div style={{ display: "none" }}>
-                  <LabelPrinting
-                    ref={labelRef}
-                    qrValue={
-                      barcodeProduct != "Escanea un código"
-                        ? barcodeProduct
-                        : "12"
-                    }
-                    metadata={metadata}
-                  />
+                  <button
+                    onClick={(e) => {}}
+                    className="w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
+                    // disabled={notFound || orders?.length === 0 ? true : false}
+                  >
+                    <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
+                      Listar
+                    </span>
+                  </button>
                 </div>
               </div>
             </div>
+          </header>
+          <div className="max-w-full mx-4 py-0 sm:mx-auto">
+            <div className="sm:flex sm:space-x-4">
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+                <div className="bg-white p-5">
+                  <div className="sm:flex sm:items-start bg-white">
+                    <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
+                      <div className="flex items-center">
+                        <Grid8 className="mr-2" color="#A0A2A6" size={20} />
+                        <h3 className="bg-white text-md font-medium text-gray">
+                          Pallet
+                        </h3>
+                      </div>
+
+                      <p className="bg-white text-3xl font-bold text-black">
+                        PAL3220400
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+                <div className="bg-white p-5">
+                  <div className="sm:flex sm:items-start bg-white">
+                    <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
+                      <div className="flex items-center">
+                        <Category className="mr-2" color="#A0A2A6" size={20} />
+                        <h3 className="bg-white text-md font-medium text-gray">
+                          Número serial actual
+                        </h3>
+                      </div>
+
+                      <p className="bg-white text-3xl font-bold text-black">
+                        {Object.keys(orderSelected).length === 0
+                          ? "--------"
+                          : barcodeProduct}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+                <div className="bg-white p-5">
+                  <div className="sm:flex sm:items-start bg-white">
+                    <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
+                      <div className="flex items-center">
+                        <HashtagSquare
+                          variant="Outline"
+                          className="mr-2"
+                          color="#A0A2A6"
+                          size={20}
+                        />
+                        <h3 className="bg-white text-md font-medium text-gray">
+                          Cantidad pallet
+                        </h3>
+                      </div>
+
+                      <p className="bg-white text-3xl font-bold text-black">
+                        {Array.isArray(metadata) && metadata.length > 0
+                          ? metadata.find(
+                              (obj) => obj.ID_CARACTMATERIAL === 185
+                            )?.DE_VALORCARACTMAT
+                          : "Selecciona órden"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+                <div className="bg-white p-5">
+                  <div className="sm:flex sm:items-start bg-white">
+                    <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
+                      <div className="flex items-center">
+                        <Health className="mr-2" color="#A0A2A6" size={20} />
+                        <h3 className="bg-white text-md font-medium text-gray">
+                          Planeado vs realizado
+                        </h3>
+                      </div>
+
+                      <p className="bg-white text-3xl font-bold text-black">
+                        1 de 2
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <div className="sm:flex sm:space-x-4">
+              <div
+                className="flex flex-col w-1/4"
+                style={{ paddingRight: "7px" }}
+              >
+                <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4">
+                  <div className="bg-white p-5">
+                    <div className="sm:flex sm:items-start bg-white">
+                      <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
+                        <div className="flex items-center">
+                          <Notepad2
+                            className="mr-2"
+                            color="#A0A2A6"
+                            size={20}
+                          />
+                          <h3 className="bg-white text-md font-medium text-gray">
+                            Órden
+                          </h3>
+                        </div>
+                        <p className="bg-white text-3xl font-bold text-black">
+                          {Object.keys(orderSelected).length === 0
+                            ? "Selecciona órden"
+                            : orderSelected.aufnr}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4">
+                  <div className="bg-white p-5">
+                    <div className="sm:flex sm:items-start bg-white">
+                      <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
+                        <div className="flex items-center">
+                          <Box1
+                            variant="Outline"
+                            className="mr-2"
+                            color="#A0A2A6"
+                            size={20}
+                          />
+                          <h3 className="bg-white text-md font-medium text-gray">
+                            Producto
+                          </h3>
+                        </div>
+                        <p className="bg-white text-3xl font-bold text-black">
+                          {Object.keys(orderSelected).length === 0
+                            ? "--------"
+                            : orderSelected.matnr.slice(-9)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4 w-3/4">
+                <div className="bg-white p-5">
+                  <h3 className="bg-white text-md font-medium text-gray">
+                    Historial
+                  </h3>
+                  <div
+                    className="flex grid justify-start"
+                    style={{ marginLeft: "-10px" }}
+                  >
+                    <GraphicHistory />
+                    <div></div>
+                  </div>
+                </div>
+              </section>
+            </div>
           </div>
-        </header>
 
-        <div className="max-w-full mx-4 py-0 sm:mx-auto sm:px-6 lg:px-4">
-          <div className="sm:flex sm:space-x-4">
-            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
-              <div className="bg-white p-5">
-                <div className="sm:flex sm:items-start bg-white">
-                  <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
-                    <div className="flex items-center">
-                      <Notepad2 className="mr-2" color="#A0A2A6" size={20} />
-                      <h3 className="bg-white text-md font-medium text-gray">
-                        Órden
-                      </h3>
-                    </div>
-
-                    <p className="bg-white text-3xl font-bold text-black">
-                      {Object.keys(orderSelected).length === 0
-                        ? "Selecciona órden"
-                        : orderSelected.aufnr}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
-              <div className="bg-white p-5">
-                <div className="sm:flex sm:items-start bg-white">
-                  <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
-                    <div className="flex items-center">
-                      <Category className="mr-2" color="#A0A2A6" size={20} />
-                      <h3 className="bg-white text-md font-medium text-gray">
-                        Número serial actual
-                      </h3>
-                    </div>
-
-                    <p className="bg-white text-3xl font-bold text-black">
-                      {Object.keys(orderSelected).length === 0
-                        ? "--------"
-                        : barcodeProduct}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
-              <div className="bg-white p-5">
-                <div className="sm:flex sm:items-start bg-white">
-                  <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
-                    <div className="flex items-center">
-                      <Box1
-                        variant="Outline"
-                        className="mr-2"
-                        color="#A0A2A6"
-                        size={20}
-                      />
-                      <h3 className="bg-white text-md font-medium text-gray">
-                        Producto
-                      </h3>
-                    </div>
-
-                    <p className="bg-white text-3xl font-bold text-black">
-                      {Object.keys(orderSelected).length === 0
-                        ? "--------"
-                        : orderSelected.matnr.slice(-9)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
-              <div className="bg-white p-5">
-                <div className="sm:flex sm:items-start bg-white">
-                  <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
-                    <div className="flex items-center">
-                      <Cd className="mr-2" color="#A0A2A6" size={20} />
-                      <h3 className="bg-white text-md font-medium text-gray">
-                        Planeado vs Realizado
-                      </h3>
-                    </div>
-                    <p className="bg-white text-3xl font-bold text-black">
-                      {Object.keys(orderSelected).length === 0
-                        ? "--------"
-                        : `${orderSelected.qtdpl} / ${orderSelected.qtdpr}`}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
+          <hr class="solid" />
+        <div className="mt-8 flex">
+        <h3 className="text-black text-2xl capitalize font-semibold text-gray-400 tracking-tight">
+                  Información adicional
+                </h3>
         </div>
+          
 
-        <div className="max-w-full mx-4 py-0 sm:mx-auto sm:px-6 lg:px-4">
-          <div className="sm:flex sm:space-x-4">
+          
+          <div className="sm:flex sm:space-x-4 mt-4">
             <section
               style={{ height: "245px", overflowY: "scroll" }}
               className="inline-block align-bottom rounded-lg border border-slate-200 text-left mb-4 w-full sm:w-1/3 sm:my-4"
@@ -454,30 +500,11 @@ function GenealogyDashboard() {
                 </div>
               </div>
             </section>
-
-            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/3 sm:my-4">
-              <div className="bg-white p-5">
-                <h3 className="bg-white text-md font-medium text-gray">
-                  Lista de materiales
-                </h3>
-                <div className="tree-view">
-                  {Object.keys(orderSelected).length === 0 ? (
-                    <p className="bg-white text-3xl font-bold text-black">
-                      {" "}
-                      --------{" "}
-                    </p>
-                  ) : (
-                    buildTreeData(orderSelected).map((node) => renderNode(node))
-                  )}
-                </div>
-              </div>
-            </section>
           </div>
-          
         </div>
       </div>
     </>
   );
 }
 
-export default GenealogyDashboard;
+export default PaletizationView;
