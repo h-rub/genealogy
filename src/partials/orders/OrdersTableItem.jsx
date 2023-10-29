@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useDispatch } from 'react-redux';
 
-import { setOrderSelected } from '../../store/slice/orderSelectedSlice';
+import { setOrderSelected, getMetadataFromOrder } from '../../store/slice/orderSelectedSlice';
 
 import { addEvent } from '../../store/slice/eventsLogSlice';
 
@@ -18,7 +18,10 @@ function OrdersTableItem(props) {
               text: 'Orden ' + props.id + ' seleccionada',
               timestamp: new Date().toISOString(),
             };
+            console.log(props)
             dispatch(setOrderSelected(props))
+            const idMaterial = props.matnr.substring(props.matnr.length - 9);
+            dispatch(getMetadataFromOrder(idMaterial))
             dispatch(addEvent(eventOrderSelected))
             const escapeKeyEvent = new KeyboardEvent('keydown', {
               key: 'Escape',
@@ -28,9 +31,8 @@ function OrdersTableItem(props) {
               bubbles: true,
               cancelable: true,
             });
-          
             document.dispatchEvent(escapeKeyEvent);
-            console.log(props)}
+            }
             }><a className="font-medium text-primary hover:text-primary ">{props.aufnr}</a></button>
         </div>
       </td>

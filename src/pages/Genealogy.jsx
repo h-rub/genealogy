@@ -1,5 +1,6 @@
 import icons from "../assets/icons/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import ReactToPrint from "react-to-print";
 
 import {
   Barcode,
@@ -24,7 +25,10 @@ import useScanDetection from "use-scan-detection";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import { selectOrderSelected } from "../store/slice/orderSelectedSlice";
+import {
+  selectOrderSelected,
+  metadataOrderSelected,
+} from "../store/slice/orderSelectedSlice";
 
 import { selectEventsLog, addEvent } from "../store/slice/eventsLogSlice";
 import {
@@ -32,11 +36,13 @@ import {
   selectTestResults,
   selectGlobalStatus,
 } from "../store/slice/testResultSlice";
+import LabelPrinting from "../partials/genealogy/LabelPrinting";
 
 function GenealogyDashboard() {
   const testResultsList = useSelector(selectTestResults);
   const globalStatus = useSelector(selectGlobalStatus);
   const orderSelected = useSelector(selectOrderSelected);
+  const metadata = useSelector(metadataOrderSelected);
   const eventsLog = useSelector(selectEventsLog);
 
   const [barcodeProduct, setBarcodeProduct] = useState("Escanea un código");
@@ -45,19 +51,23 @@ function GenealogyDashboard() {
 
   const dispatch = useDispatch();
 
+  const labelRef = useRef();
+
   useScanDetection({
     onComplete: (code) => {
       console.log(code);
       const codeScannedEvent = {
-        text: "Producto escaneado: " + code,
+        text: "Producto escaneado: " + code.replace(/Shift/g, ""),
         timestamp: new Date().toISOString(),
       };
-      setBarcodeProduct(code);
+      setBarcodeProduct(code.replace(/Shift/g, ""));
       dispatch(addEvent(codeScannedEvent));
-      dispatch(getTestResults("5153000647C2PLGHJ"));
+      dispatch(getTestResults(code.replace(/Shift/g, "")));
 
       const getTestResultsEvent = {
-        text: "Consultando resultados de prueba de producto: " + code,
+        text:
+          "Consultando resultados de prueba de producto: " +
+          code.replace(/Shift/g, ""),
         timestamp: new Date().toISOString(),
       };
 
@@ -147,7 +157,6 @@ function GenealogyDashboard() {
   // }, []);
 
   function buildTreeData(obj) {
-    console.log(obj);
     if (typeof obj === "undefined" || Object.keys(obj).length === 0) {
       console.log("Boom undefined");
       return [];
@@ -237,22 +246,41 @@ function GenealogyDashboard() {
                   </span>
                 </button>
 
-                <button
-                  onClick={(e) => {}}
-                  className=
-                  {globalStatus === 1 ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500" : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"}
-                  
-                  disabled={globalStatus !== 1}
-                >
-                  <Barcode
-                    className="mr-2 my-auto ml-4 bg-transparent"
-                    color="#ffff"
-                    size={20}
+                <ReactToPrint
+                  trigger={() => (
+                    <button
+                      onClick={(e) => {}}
+                      className={
+                        globalStatus === 1
+                          ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
+                          : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
+                      }
+                      disabled={globalStatus !== 1}
+                    >
+                      <Barcode
+                        className="mr-2 my-auto ml-4 bg-transparent"
+                        color="#ffff"
+                        size={20}
+                      />
+                      <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
+                        Imprimir etiqueta
+                      </span>
+                    </button>
+                  )}
+                  content={() => labelRef.current}
+                />
+
+                <div style={{ display: "none" }}>
+                  <LabelPrinting
+                    ref={labelRef}
+                    qrValue={
+                      barcodeProduct != "Escanea un código"
+                        ? barcodeProduct
+                        : "12"
+                    }
+                    metadata={metadata}
                   />
-                  <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
-                    Imprimir etiqueta
-                  </span>
-                </button>
+                </div>
               </div>
             </div>
           </div>

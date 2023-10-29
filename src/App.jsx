@@ -8,6 +8,7 @@ import './css/style.scss';
 
 import Dashboard from './pages/Dashboard';
 import Signin from './pages/Signin';
+import LabelPrinting from './partials/genealogy/LabelPrinting'
 
 
 //PRIVATE ROUTE AND PUBLIC ROUTE
@@ -42,6 +43,15 @@ function App() {
             element={
               <PublicRoute>
                 <Signin />
+              </PublicRoute>
+            }
+      />
+
+      <Route
+            path='/print-label'
+            element={
+              <PublicRoute>
+                <LabelPrinting />
               </PublicRoute>
             }
       />
