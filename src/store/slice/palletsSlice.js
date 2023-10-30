@@ -57,7 +57,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
         quantity: quantity
     }
     axios
-      .post('http://127.0.0.1:8000/api/v1/paletization/pallets/', palletData)
+      .post('http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/', palletData)
       .then((response) => {
         if (response.status === 201) {
           //dispatch(setLoading(false));
@@ -85,7 +85,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
     // };
     // dispatch(addEvent(startFetchOrders));
     axios
-     .get(`http://127.0.0.1:8000/api/v1/paletization/pallets/${palletIdentifier}/components/`)
+     .get(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletIdentifier}/components/`)
      .then((response) => {
         if (response.status === 200) {
           //dispatch(setLoading(false));
@@ -108,7 +108,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
             material_type: "TypeA"
     }
     axios
-      .post(`http://127.0.0.1:8000/api/v1/paletization/pallets/${palletID}/components/add/`, data)
+      .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletID}/components/add/`, data)
       .then((response) => {
         if (response.status === 201) {
             notifyProductMounted(serial)
@@ -128,7 +128,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
   export const unmountComponentAPI = (palletIdentifier, component) => (dispatch) => {
     // Realiza una solicitud DELETE para desmontar el componente
     axios
-      .delete(`http://127.0.0.1:8000/api/v1/paletization/pallets/${palletIdentifier}/components/${component.id}/dismount/`)
+      .delete(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletIdentifier}/components/${component.id}/dismount/`)
       .then((response) => {
         if (response.status === 204) {
             notifyProductUnmounted(component.compUnitSerial);
