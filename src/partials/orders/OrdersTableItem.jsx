@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { setOrderSelected, getMetadataFromOrder } from '../../store/slice/orderSelectedSlice';
 
 import { addEvent } from '../../store/slice/eventsLogSlice';
+import { notifyOrderSelected } from '../paletization/Toasts';
 
 function OrdersTableItem(props) {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ function OrdersTableItem(props) {
               timestamp: new Date().toISOString(),
             };
             console.log(props)
+            notifyOrderSelected(props.id);
             dispatch(setOrderSelected(props))
             const idMaterial = props.matnr.substring(props.matnr.length - 9);
             dispatch(getMetadataFromOrder(idMaterial))

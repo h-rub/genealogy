@@ -37,6 +37,7 @@ import {
   selectGlobalStatus,
 } from "../store/slice/testResultSlice";
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
+import { notifyProductScanned } from "../partials/paletization/Toasts";
 
 function GenealogyDashboard() {
   const testResultsList = useSelector(selectTestResults);
@@ -60,6 +61,7 @@ function GenealogyDashboard() {
         text: "Producto escaneado: " + code.replace(/Shift/g, ""),
         timestamp: new Date().toISOString(),
       };
+      notifyProductScanned(code.replace(/Shift/g, ""));
       setBarcodeProduct(code.replace(/Shift/g, ""));
       dispatch(addEvent(codeScannedEvent));
       dispatch(getTestResults(code.replace(/Shift/g, "")));
@@ -235,7 +237,7 @@ function GenealogyDashboard() {
               </h3>
               {/* Header: Right side */}
               <div className="flex items-center space-x-3">
-                <button className="border border-slate-300 rounded w-64 h-12 text-base flex justify-center font-semibold mr-2">
+                {/* <button className="border border-slate-300 rounded w-64 h-12 text-base flex justify-center font-semibold mr-2">
                   <Scan
                     className="mr-2 my-auto ml-4 bg-transparent"
                     color="black"
@@ -244,7 +246,7 @@ function GenealogyDashboard() {
                   <span className="my-auto text-black font-semibold">
                     Escanear producto
                   </span>
-                </button>
+                </button> */}
 
                 <ReactToPrint
                   trigger={() => (
@@ -309,7 +311,7 @@ function GenealogyDashboard() {
               </div>
             </section>
 
-            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/3 sm:my-4">
               <div className="bg-white p-5">
                 <div className="sm:flex sm:items-start bg-white">
                   <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">

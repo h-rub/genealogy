@@ -180,10 +180,9 @@ const LabelPrinting = forwardRef((props, ref) => {
                   <BarcodeGeneratorFunction value={qrValue} />
                 </div>
                 <div className="serial">
-                  <span> {Array.isArray(metadata) && metadata.length > 0 ? 
-                  metadata[0].ID_MATERIAL : ""}</span>
+                  <span> {qrValue.slice(0, 9)}</span>
                   {/* Pendiente numeroSerie */}
-                  <span>A23QMG50</span>
+                  <span>{qrValue.slice(qrValue.length - 8)}</span>
                 </div>
                 <span className="made-country">
                   HECHO <br />

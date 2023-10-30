@@ -4,6 +4,7 @@ import openOrdersSlice from './slice/ordersSlice.js';
 import orderSelectedSlice from './slice/orderSelectedSlice';
 import eventsLogSlice from './slice/eventsLogSlice';
 import testResultsSlice from './slice/testResultSlice';
+import palletsSlice from './slice/palletsSlice';
 // import usersSlice from './slice/usersSlice';
 // import BaseCapabilitiesSlice from './slice/BaseCapabilitiesSlice';
 // import LineRateCustomSlice from './slice/LineRateCustomSlice';
@@ -24,6 +25,11 @@ const store = configureStore({
     orderSelected: orderSelectedSlice,
     eventsLog: eventsLogSlice,
     testResults: testResultsSlice,
+    pallets: palletsSlice,
+    // users: usersSlice,
+    // group: BaseCapabilitiesSlice,
+    // calendar: calendarSlice,
+    // planning: planningSlice,
     // users: usersSlice,
     // group: BaseCapabilitiesSlice,
     // calendar: calendarSlice,

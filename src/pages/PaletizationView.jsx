@@ -36,7 +36,12 @@ import {
   selectTestResults,
   selectGlobalStatus,
 } from "../store/slice/testResultSlice";
+import {createPallet, selectPallet, selectComponents, mountComponent} from '../store/slice/palletsSlice'
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
+import ComponentsTable from "../partials/paletization/ComponentsTable";
+
+
+import { notifyPalletScanned, notifyProductScanned } from "../partials/paletization/Toasts";
 
 function PaletizationView() {
   const testResultsList = useSelector(selectTestResults);
@@ -45,7 +50,8 @@ function PaletizationView() {
   const metadata = useSelector(metadataOrderSelected);
   const eventsLog = useSelector(selectEventsLog);
 
-  const [barcodeProduct, setBarcodeProduct] = useState("Escanea un código");
+  const [barcodePallet, setBarcodePallet] = useState("Escanea pallet");
+  const [barcodeProduct, setBarcodeProduct] = useState("Escanea producto");
 
   const [treeData, setTreeData] = useState([]);
 
@@ -53,25 +59,64 @@ function PaletizationView() {
 
   const labelRef = useRef();
 
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  const palletSelected = useSelector(selectPallet);
+
+  const componentsList = useSelector(selectComponents);
+
+  const handleSelectedItems = (selectedItems) => {
+    setSelectedItems([...selectedItems]);
+  };
+
   useScanDetection({
     onComplete: (code) => {
       console.log(code);
-      const codeScannedEvent = {
-        text: "Producto escaneado: " + code.replace(/Shift/g, ""),
-        timestamp: new Date().toISOString(),
-      };
-      setBarcodeProduct(code.replace(/Shift/g, ""));
-      dispatch(addEvent(codeScannedEvent));
-      dispatch(getTestResults(code.replace(/Shift/g, "")));
+      if (code.replace(/Shift/g, "").length >= 11) {
+        // Si la cadena tiene al menos 9 caracteres, considerarla un ID de producto
+        const codeScannedEvent = {
+          text: "Producto escaneado: " + code.replace(/Shift/g, ""),
+          timestamp: new Date().toISOString(),
+        };
+        notifyProductScanned(code.replace(/Shift/g, ""));
+        setBarcodeProduct(code.replace(/Shift/g, ""));
+        dispatch(addEvent(codeScannedEvent));
+        dispatch(getTestResults(code.replace(/Shift/g, "")));
+  
+        const getTestResultsEvent = {
+          text:
+            "Consultando resultados de prueba de producto: " +
+            code.replace(/Shift/g, ""),
+          timestamp: new Date().toISOString(),
+        };
 
-      const getTestResultsEvent = {
-        text:
-          "Consultando resultados de prueba de producto: " +
-          code.replace(/Shift/g, ""),
-        timestamp: new Date().toISOString(),
-      };
+        
+  
+        dispatch(addEvent(getTestResultsEvent));
 
-      dispatch(addEvent(getTestResultsEvent));
+        dispatch(mountComponent(palletSelected.identifier,  code.replace(/Shift/g, "")));
+       
+      } else {
+        // Si la cadena es más corta, considerarla un ID de pallet
+        const codeScannedEvent = {
+          text: "Pallet escaneado: " + code.replace(/Shift/g, ""),
+          timestamp: new Date().toISOString(),
+        };
+        setBarcodePallet(code.replace(/Shift/g, ""));
+        dispatch(addEvent(codeScannedEvent));
+        dispatch(createPallet(code.replace(/Shift/g, "")));
+  
+        const createPalletEvent = {
+          text:
+            "Consultando registro de Pallet: " +
+            code.replace(/Shift/g, ""),
+          timestamp: new Date().toISOString(),
+        };
+        notifyPalletScanned(code.replace(/Shift/g, ""))
+  
+        dispatch(addEvent(createPalletEvent));
+      }
+     
     },
   });
 
@@ -244,11 +289,15 @@ function PaletizationView() {
 
                   <button
                     onClick={(e) => {}}
-                    className="w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
-                    // disabled={notFound || orders?.length === 0 ? true : false}
+                    className={
+                      palletSelected.quantity == componentsList.length
+                        ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
+                        : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
+                    }
+                     disabled={palletSelected.quantity != componentsList.length ? true : false}
                   >
                     <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
-                      Listar
+                      Procesar
                     </span>
                   </button>
                 </div>
@@ -257,7 +306,7 @@ function PaletizationView() {
           </header>
           <div className="max-w-full mx-4 py-0 sm:mx-auto">
             <div className="sm:flex sm:space-x-4">
-              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/3 sm:my-4">
                 <div className="bg-white p-5">
                   <div className="sm:flex sm:items-start bg-white">
                     <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
@@ -269,14 +318,16 @@ function PaletizationView() {
                       </div>
 
                       <p className="bg-white text-3xl font-bold text-black">
-                        PAL3220400
+                      {Object.keys(orderSelected).length === 0 
+                        ? "Selecciona órden"
+                        : barcodePallet}
                       </p>
                     </div>
                   </div>
                 </div>
               </section>
 
-              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/3 sm:my-4">
                 <div className="bg-white p-5">
                   <div className="sm:flex sm:items-start bg-white">
                     <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
@@ -297,7 +348,7 @@ function PaletizationView() {
                 </div>
               </section>
 
-              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/6 sm:my-4">
                 <div className="bg-white p-5">
                   <div className="sm:flex sm:items-start bg-white">
                     <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
@@ -318,26 +369,28 @@ function PaletizationView() {
                           ? metadata.find(
                               (obj) => obj.ID_CARACTMATERIAL === 185
                             )?.DE_VALORCARACTMAT
-                          : "Selecciona órden"}
+                          : "--------"}
                       </p>
                     </div>
                   </div>
                 </div>
               </section>
 
-              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/6 sm:my-4">
                 <div className="bg-white p-5">
                   <div className="sm:flex sm:items-start bg-white">
                     <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
                       <div className="flex items-center">
                         <Health className="mr-2" color="#A0A2A6" size={20} />
                         <h3 className="bg-white text-md font-medium text-gray">
-                          Planeado vs realizado
+                          Total montados
                         </h3>
                       </div>
 
                       <p className="bg-white text-3xl font-bold text-black">
-                        1 de 2
+                      {Object.keys(orderSelected).length === 0
+                          ? "--------"
+                          : componentsList.length}
                       </p>
                     </div>
                   </div>
@@ -346,7 +399,7 @@ function PaletizationView() {
             </div>
             <div className="sm:flex sm:space-x-4">
               <div
-                className="flex flex-col w-1/4"
+                className="flex flex-col w-1/3"
                 style={{ paddingRight: "7px" }}
               >
                 <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4">
@@ -402,13 +455,13 @@ function PaletizationView() {
               <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4 w-3/4">
                 <div className="bg-white p-5">
                   <h3 className="bg-white text-md font-medium text-gray">
-                    Historial
+                    Listado de componentes
                   </h3>
                   <div
-                    className="flex grid justify-start"
+                    className="flex justify-start"
                     style={{ marginLeft: "-10px" }}
                   >
-                    <GraphicHistory />
+                   <ComponentsTable selectedItems={handleSelectedItems}/>
                     <div></div>
                   </div>
                 </div>
@@ -503,6 +556,7 @@ function PaletizationView() {
           </div>
         </div>
       </div>
+      
     </>
   );
 }

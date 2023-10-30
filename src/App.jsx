@@ -14,6 +14,7 @@ import LabelPrinting from "./partials/genealogy/LabelPrinting";
 //PRIVATE ROUTE AND PUBLIC ROUTE
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
+import toast, { Toaster, ToastBar } from "react-hot-toast";
 
 function App() {
   const location = useLocation();
@@ -68,6 +69,33 @@ function App() {
           }
         />
       </Routes>
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName="bg-transparent"
+        containerStyle={{ backgroundColor: "transparent" }}
+        toastOptions={{
+          // Define default options
+          style: {
+           
+          },
+          
+          duration: 5000,
+
+          // Default options for specific types
+          success: {
+            duration: 3000,
+          },
+        }}
+      >
+        {(t) => (
+          <ToastBar
+           
+            toast={t}
+          ></ToastBar>
+        )}
+      </Toaster>
     </>
   );
 }
