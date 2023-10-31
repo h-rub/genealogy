@@ -98,14 +98,14 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
      .catch((error) => endpointsCodes(error, dispatch, setNotFound));
   }
 
-  export const mountComponent = (palletID, serial) => (dispatch) => {
+  export const mountComponent = (palletID, serial, condenserMaterial, compressorMaterial) => (dispatch) => {
     const data = {
             pallet_id: palletID,
             condenser_unit_serial: serial,
-            condenser_material_code: "CondenserMaterial",
+            condenser_material_code: condenserMaterial,
             compressor_unit_serial: serial,
-            compressor_material_code: "CompressorMaterial",
-            material_type: "TypeA"
+            compressor_material_code: compressorMaterial,
+            material_type: "-"
     }
     axios
       .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletID}/components/add/`, data)

@@ -93,8 +93,10 @@ function PaletizationView() {
         
   
         dispatch(addEvent(getTestResultsEvent));
+        const condenserMaterial = orderSelected.matnr.slice(-9);
+        const compressorMaterial = orderSelected.components[0].matnr;
 
-        dispatch(mountComponent(palletSelected.identifier,  code.replace(/Shift/g, "")));
+        dispatch(mountComponent(palletSelected.identifier,  code.replace(/Shift/g, ""), condenserMaterial, compressorMaterial));
        
       } else {
         // Si la cadena es más corta, considerarla un ID de pallet
