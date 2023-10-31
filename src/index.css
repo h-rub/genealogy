@@ -261,6 +261,7 @@ h1 {
 }
 
 .serial {
+  padding-left: 26px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -269,6 +270,7 @@ h1 {
 }
 
 .row9 .made-country {
+  padding-left: 12px;
   display: flex;
   flex-direction: row;
   justify-content: center;
