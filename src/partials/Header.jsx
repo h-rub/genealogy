@@ -33,6 +33,13 @@ function Header({
 
   return (
     <>
+    {openOrdersList.length === 0 && (
+       
+       <div className="infinite-progress-bar">
+       <div className="bar"></div>
+     </div>
+
+      )}
       <div className="w-screen relative sticky top-0 z-50">
         <nav className="bg-black py-5">
           <div className="bg-black container mx-auto flex">
