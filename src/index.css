@@ -19,7 +19,7 @@ h1 {
 
 @page {
   size: 14.8cm 6.3cm; /* Tamaño de la etiqueta horizontal */
-  margin: 0px; /* Sin márgenes para aprovechar todo el espacio de la etiqueta */
+  margin: 10px 0px 0px 0px; /* Sin márgenes para aprovechar todo el espacio de la etiqueta */
 }
 
 

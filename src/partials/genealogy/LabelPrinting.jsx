@@ -29,7 +29,7 @@ const LabelPrinting = forwardRef((props, ref) => {
   
   return (
     <div ref={ref}>
-      <div ref={ref}>
+      <div ref={ref} className="page">
         <table className="container-table">
           <tr className="container-row">
             <td className="row1">
