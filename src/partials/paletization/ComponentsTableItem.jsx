@@ -24,7 +24,7 @@ function ComponentsItem(props) {
         <div className="flex items-center">
           <button  onClick={() => {
             }
-            }><a className="font-medium text-primary hover:text-primary ">{props.id}</a></button>
+            }><a className="font-medium text-primary hover:text-primary ">{props.rowNumber}</a></button>
         </div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">

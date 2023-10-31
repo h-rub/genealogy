@@ -146,10 +146,12 @@ function ComponentsTable({ selectedItems }) {
             {/* Table body */}
             <tbody className="text-sm divide-y divide-slate-200">
               {Array.isArray(componentsList) && componentsList.length > 0
-                ? componentsList.map((component) => {
+                ? componentsList.map((component, index) => {
+                  const rowNumber = index + 1;
                     return (
                       <ComponentsItem
                         key={component.id}
+                        rowNumber={rowNumber}
                         id={component.id}
                         compMaterialCode={component.compressor_material_code}
                         compUnitSerial={component.compressor_unit_serial}
