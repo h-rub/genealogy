@@ -120,6 +120,12 @@ function ComponentsTable({ selectedItems }) {
                   <div className="font-semibold text-left">ID</div>
                 </th>
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                  <div className="font-semibold">Código de mat. (UC)</div>
+                </th>
+                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                  <div className="font-semibold text-left">Serial (UC)</div>
+                </th>
+                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                   <div className="font-semibold text-left">
                     Código de mat. (Compresor)
                   </div>
@@ -128,12 +134,6 @@ function ComponentsTable({ selectedItems }) {
                   <div className="font-semibold text-left">
                     Serial (Compresor)
                   </div>
-                </th>
-                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                  <div className="font-semibold">Código de mat. (UC)</div>
-                </th>
-                <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                  <div className="font-semibold text-left">Serial (UC)</div>
                 </th>
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                   <div className="font-semibold text-center">Tipo material</div>
