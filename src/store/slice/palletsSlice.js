@@ -142,3 +142,27 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
         endpointsCodes(error, dispatch, setNotFound);
       });
   };
+
+  export const processInSAP = (orderSelected, pallet, components) => (dispatch) => {
+    const currentDatetime = new Date();
+    const currentDate = currentDatetime.toISOString().split('T')[0];
+    const currentTime = currentDatetime.toLocaleTimeString('en-US', { hour12: false });
+    const ItJsonInst = components.map((component) => ({
+      sernr: component.condenser_unit_serial,
+      serfi: component.compressor_unit_serial,
+      matnr: component.condenser_material_code,
+      matfi: component.compressor_material_code,
+      t: "S"
+    }));
+
+    const xmlData = {
+      IArbpl: orderSelected.arbpl,
+      IAufnr: orderSelected.aufnr,
+      ICharg: pallet.identifier,
+      IDataProd: currentDate,
+      IHoraProd: currentTime,
+      IQuantProd: ItJsonInst.length,
+      ItJsonInst: ItJsonInst
+    };
+    console.log(xmlData);
+  }

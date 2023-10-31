@@ -36,7 +36,7 @@ import {
   selectTestResults,
   selectGlobalStatus,
 } from "../store/slice/testResultSlice";
-import {createPallet, selectPallet, selectComponents, mountComponent} from '../store/slice/palletsSlice'
+import {createPallet, selectPallet, selectComponents, mountComponent, processInSAP} from '../store/slice/palletsSlice'
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
 import ComponentsTable from "../partials/paletization/ComponentsTable";
 
@@ -290,7 +290,9 @@ function PaletizationView() {
                   </button>
 
                   <button
-                    onClick={(e) => {}}
+                    onClick={
+                      processInSAP(orderSelected, palletSelected, componentsList) //
+                    }
                     className={
                       palletSelected.quantity == componentsList.length
                         ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
