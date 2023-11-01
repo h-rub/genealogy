@@ -36,12 +36,21 @@ import {
   selectTestResults,
   selectGlobalStatus,
 } from "../store/slice/testResultSlice";
-import {createPallet, selectPallet, selectComponents, mountComponent, processInSAP} from '../store/slice/palletsSlice'
+import {
+  createPallet,
+  selectPallet,
+  selectComponents,
+  mountComponent,
+  processInSAP,
+} from "../store/slice/palletsSlice";
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
 import ComponentsTable from "../partials/paletization/ComponentsTable";
 
-
-import { notifyPalletScanned, notifyProductScanned } from "../partials/paletization/Toasts";
+import {
+  notifyPalletScanned,
+  notifyProductScanned,
+} from "../partials/paletization/Toasts";
+import ModalBlank from "../components/ModalBlank";
 
 function PaletizationView() {
   const testResultsList = useSelector(selectTestResults);
@@ -49,6 +58,8 @@ function PaletizationView() {
   const orderSelected = useSelector(selectOrderSelected);
   const metadata = useSelector(metadataOrderSelected);
   const eventsLog = useSelector(selectEventsLog);
+
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   const [barcodePallet, setBarcodePallet] = useState("Escanea pallet");
   const [barcodeProduct, setBarcodeProduct] = useState("Escanea producto");
@@ -82,7 +93,7 @@ function PaletizationView() {
         setBarcodeProduct(code.replace(/Shift/g, ""));
         dispatch(addEvent(codeScannedEvent));
         dispatch(getTestResults(code.replace(/Shift/g, "")));
-  
+
         const getTestResultsEvent = {
           text:
             "Consultando resultados de prueba de producto: " +
@@ -90,14 +101,35 @@ function PaletizationView() {
           timestamp: new Date().toISOString(),
         };
 
-        
-  
         dispatch(addEvent(getTestResultsEvent));
         const condenserMaterial = orderSelected.matnr.slice(-9);
         const compressorMaterial = orderSelected.components[0].matnr;
+        // console.log("GLOBAL STATUS" + globalStatus);
+        
+        // if (globalStatus === 0) {
+        //   setInfoModalOpen(true);
+        // } else if (globalStatus === 1) {
+        //   setInfoModalOpen(false);
+        //   dispatch(
+        //     mountComponent(
+        //       palletSelected.identifier,
+        //       code.replace(/Shift/g, ""),
+        //       condenserMaterial,
+        //       compressorMaterial
+        //     )
+        //   );
+      //}
+          dispatch(
+            mountComponent(
+              palletSelected.identifier,
+              code.replace(/Shift/g, ""),
+              condenserMaterial,
+              compressorMaterial
+            )
+          );
 
-        dispatch(mountComponent(palletSelected.identifier,  code.replace(/Shift/g, ""), condenserMaterial, compressorMaterial));
        
+        
       } else {
         // Si la cadena es más corta, considerarla un ID de pallet
         const codeScannedEvent = {
@@ -107,18 +139,15 @@ function PaletizationView() {
         setBarcodePallet(code.replace(/Shift/g, ""));
         dispatch(addEvent(codeScannedEvent));
         dispatch(createPallet(code.replace(/Shift/g, "")));
-  
+
         const createPalletEvent = {
-          text:
-            "Consultando registro de Pallet: " +
-            code.replace(/Shift/g, ""),
+          text: "Consultando registro de Pallet: " + code.replace(/Shift/g, ""),
           timestamp: new Date().toISOString(),
         };
-        notifyPalletScanned(code.replace(/Shift/g, ""))
-  
+        notifyPalletScanned(code.replace(/Shift/g, ""));
+
         dispatch(addEvent(createPalletEvent));
       }
-     
     },
   });
 
@@ -291,14 +320,22 @@ function PaletizationView() {
 
                   <button
                     onClick={
-                      processInSAP(orderSelected, palletSelected, componentsList) //
+                      processInSAP(
+                        orderSelected,
+                        palletSelected,
+                        componentsList
+                      ) //
                     }
                     className={
                       palletSelected.quantity == componentsList.length
                         ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
                         : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
                     }
-                     disabled={palletSelected.quantity != componentsList.length ? true : false}
+                    disabled={
+                      palletSelected.quantity != componentsList.length
+                        ? true
+                        : false
+                    }
                   >
                     <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
                       Procesar
@@ -322,9 +359,9 @@ function PaletizationView() {
                       </div>
 
                       <p className="bg-white text-3xl font-bold text-black">
-                      {Object.keys(orderSelected).length === 0 
-                        ? "Selecciona órden"
-                        : barcodePallet}
+                        {Object.keys(orderSelected).length === 0
+                          ? "Selecciona órden"
+                          : barcodePallet}
                       </p>
                     </div>
                   </div>
@@ -392,7 +429,7 @@ function PaletizationView() {
                       </div>
 
                       <p className="bg-white text-3xl font-bold text-black">
-                      {Object.keys(orderSelected).length === 0
+                        {Object.keys(orderSelected).length === 0
                           ? "--------"
                           : componentsList.length}
                       </p>
@@ -465,7 +502,7 @@ function PaletizationView() {
                     className="flex justify-start"
                     style={{ marginLeft: "-10px" }}
                   >
-                   <ComponentsTable selectedItems={handleSelectedItems}/>
+                    <ComponentsTable selectedItems={handleSelectedItems} />
                     <div></div>
                   </div>
                 </div>
@@ -474,14 +511,12 @@ function PaletizationView() {
           </div>
 
           <hr class="solid" />
-        <div className="mt-8 flex">
-        <h3 className="text-black text-2xl capitalize font-semibold text-gray-400 tracking-tight">
-                  Información adicional
-                </h3>
-        </div>
-          
+          <div className="mt-8 flex">
+            <h3 className="text-black text-2xl capitalize font-semibold text-gray-400 tracking-tight">
+              Información adicional
+            </h3>
+          </div>
 
-          
           <div className="sm:flex sm:space-x-4 mt-4">
             <section
               style={{ height: "245px", overflowY: "scroll" }}
@@ -560,7 +595,89 @@ function PaletizationView() {
           </div>
         </div>
       </div>
-      
+     
+      <ModalBlank
+        id="info-modal"
+        modalOpen={infoModalOpen}
+        setModalOpen={setInfoModalOpen}
+      >
+        <div className="p-5 flex space-x-4">
+          {/* Icon */}
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+            <svg
+              className="w-4 h-4 shrink-0 fill-current text-rose-500"
+              viewBox="0 0 16 16"
+            >
+              <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm1 12H7V7h2v5zM8 6c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z" />
+            </svg>
+          </div>
+          {/* Content */}
+          <div>
+            {/* Modal header */}
+            <div className="mb-2">
+              <div className="text-lg font-semibold text-slate-800 text-left">
+                No es posible montar {barcodeProduct}
+              </div>
+            </div>
+            {/* Modal content */}
+            <div className="text-sm mb-10 text-left">
+              <div className="space-y-2">
+                <p>
+                  El componente no puede ser montado ya que hay uno o más errores en sus pruebas, es posible que el componente se encuentre dañado:
+                </p>
+                <h3 className="bg-white text-md font-medium text-gray">
+                  Semáforo
+                </h3>
+                <h3 className="bg-white text-2xl font-semibold text-black">
+                  {testResultsList && testResultsList.length > 0 ? (
+                    <div>
+                      Estado global:{" "}
+                      <span
+                        className={
+                          globalStatus === 1 ? "text-primary" : "text-red-500"
+                        }
+                      >
+                        {globalStatus === 1 ? "OK" : "Error"}
+                      </span>
+                      {/* Muestra los detalles de los resultados de prueba aquí si es necesario */}
+                    </div>
+                  ) : (
+                    <p className="text-black">
+                      Resultados de pruebas no disponibles.
+                    </p>
+                  )}
+                </h3>
+                <div
+                  className="flex grid justify-start"
+                  style={{ marginLeft: "-10px", marginTop: "10px" }}
+                >
+                  {testResultsList && testResultsList.length > 0 ? (
+                    <div>
+                      <Stepper
+                        className="!ml-0"
+                        steps={testResultsList}
+                        currentStepIndex={2}
+                        styles={stylesOverride}
+                      />
+
+                      {/* Muestra los detalles de los resultados de prueba aquí si es necesario */}
+                    </div>
+                  ) : (
+                    <p className="text-black ml-3"></p>
+                  )}
+                  <div></div>
+                </div>
+              </div>
+            </div>
+            {/* Modal footer */}
+            <div className="flex flex-wrap justify-end">
+              <button className="btn-sm bg-primary hover:primary text-white" onClick={(e) => { e.stopPropagation(); setInfoModalOpen(false); }}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      </ModalBlank>
     </>
   );
 }
