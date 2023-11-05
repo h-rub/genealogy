@@ -5,9 +5,13 @@ export const notifyPalletScanned = (code) => toast.success('Pallet escaneado: ' 
 
 export const notifyOrderSelected = (number) => toast.success(`Orden ${number} seleccionada`);
 
-export const notifyProductScanned = (code) => toast.success('Producto escaneado: ' + code, { style: {} });
+export const notifyProductScanned = (code) => toast.success('Compresor escaneado: ' + code, { style: {} });
+
+export const notifyCondenserScanned = (code) => toast.success('Condensador escaneado: ' + code, { style: {} });
 
 export const notifyProductMounted = (code) => toast.success('Producto montado: ' + code, { style: {} });
+
+export const notifyProductsJoined= (code) => toast.success('Unión exitosa: ' + code, { style: {} });
 
 export const notifyProductUnmounted = (code) => toast.success('Producto desmontado: ' + code, { style: {} , icon: 'ℹ️' });
 

@@ -14,6 +14,7 @@ const testResultsSlice = createSlice({
     },
     reducers: {
         setTestResults: (state, action) => {
+          console.log("Setting test results")
           state.testResults = action.payload;
         },
         setGlobalStatus: (state, action) => {

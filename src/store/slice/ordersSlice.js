@@ -3,6 +3,7 @@ import axios from 'axios';
 import { endpointsCodes } from './endpointCodes';
 
 import { selectEventsLog, addEvent } from './eventsLogSlice';
+import { notifyError } from '../../partials/paletization/Toasts';
 
 
 const initialState = {
@@ -59,8 +60,12 @@ export const getOpenOrdersList = () => (dispatch) => {
           //dispatch(setLoading(false));
           console.log(response.data);
           dispatch(setOpenOrdersList(response.data));
+        } else {
+          notifyError("Ocurrió un error al obtener los órdenes desde SAP.")
         }
       })
-      .catch((error) => endpointsCodes(error, dispatch, setNotFound));
+      .catch((error) => {
+        notifyError("Ocurrió un error al obtener los órdenes desde SAP.")
+        endpointsCodes(error, dispatch, setNotFound)});
   };
   

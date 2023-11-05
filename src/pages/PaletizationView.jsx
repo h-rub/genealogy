@@ -549,7 +549,7 @@ function PaletizationView() {
             <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/3 sm:my-4">
               <div className="bg-white p-5">
                 <h3 className="bg-white text-md font-medium text-gray">
-                  Semáforo
+                  Resultados de pruebas
                 </h3>
                 <h3 className="bg-white text-2xl font-semibold text-black">
                   {testResultsList && testResultsList.length > 0 ? (

@@ -1,11 +1,12 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { endpointsCodes } from './endpointCodes';
-import { notifyProductMounted, notifyProductUnmounted } from '../../partials/paletization/Toasts';
+import { notifyError, notifyProductMounted, notifyProductUnmounted, notifyProductsJoined } from '../../partials/paletization/Toasts';
 
 const initialState = {
     pallet: {},
-    components : []
+    components : [],
+    componentsJoined: false
 }
 
 const palletsSlice = createSlice({
@@ -23,12 +24,14 @@ const palletsSlice = createSlice({
         setNotFound: (state, action) => {
             state.notFound = action.payload;
           },
-
         unmountComponent: (state, action) => {
             const component = action.payload;
             state.components = state.components.filter((component) => component.id !== component.id);
            
         },
+        setComponentsJoined: (state, action) => {
+          state.componentsJoined = action.payload;
+        }
       },
 });
 
@@ -36,6 +39,7 @@ export const {
     setPallet,
     setComponents,
     unmountComponent,
+    setComponentsJoined
   } = palletsSlice.actions;
   
 
@@ -43,7 +47,28 @@ export const selectPallet = (state) => state.pallets.pallet;
 
 export const selectComponents = (state) => state.pallets.components;
 
+export const selectComponentsJoined = (state) => state.pallets.componentsJoined;
+
 export default palletsSlice.reducer;
+
+export const joinComponents = (payload) => (dispatch) => {
+ 
+  axios
+    .post(`http://em10vs0010.embraco.com:8002/api/v1/genealogy/component/`, payload)
+    .then((response) => {
+      if (response.status === 201) {
+        notifyProductsJoined(payload.compressor_unit_serial)
+        dispatch(setComponentsJoined(true));
+        
+      } else {
+        dispatch(notifyError('Hubo un error al unir los componentes, reintente.'));
+      }
+    })
+    .catch((error) => {
+      // Manejo de errores, si es necesario
+    });
+    
+};
 
 export const createPallet = (barcode, quantity) => (dispatch) => {
     //dispatch(setLoading(true));
@@ -62,7 +87,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
         if (response.status === 201) {
           //dispatch(setLoading(false));
           console.log("Pallet creado con éxito:", response.data);
-          //dispatch(setTestResults(response.data.results));
+          //dispatch(setCompressorTestResults(response.data.results));
           //console.log(response.data.global_status);
           //dispatch(setGlobalStatus(response.data.global_status));
           dispatch(setPallet(response.data));

@@ -74,7 +74,7 @@ function App() {
         reverseOrder={false}
         gutter={8}
         containerClassName="bg-transparent"
-        containerStyle={{ backgroundColor: "transparent" }}
+        containerStyle={{ backgroundColor: "transparent", background: "transparent" }}
         toastOptions={{
           // Define default options
           style: {
