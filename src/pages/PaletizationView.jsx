@@ -47,6 +47,7 @@ import {
   processInSAP,
   getCompressor,
   setComponentsJoined,
+  setComponents,
 } from "../store/slice/palletsSlice";
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
 import ComponentsTable from "../partials/paletization/ComponentsTable";
@@ -238,10 +239,12 @@ function PaletizationView() {
 
   function handleNew() {
     console.log("Handle new step");
+    setBarcodePallet("Escanea pallet");
     setBarcodeProduct("Escanea producto");
     dispatch(setGlobalStatus(""));
     dispatch(setTestResults([]));
     dispatch(setComponentsJoined(false));
+    dispatch(setComponents([]));
   }
 
   function buildTreeData(obj) {

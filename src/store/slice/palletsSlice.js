@@ -67,12 +67,15 @@ export const joinComponents = (payload) => (dispatch) => {
         notifyProductsJoined(payload.compressor_unit_serial)
         dispatch(setComponentsJoined(true));
         
-      } else if (response.status === 404) {
-        dispatch(setComponentsJoined(true));
-        dispatch(notifyError('Hubo un error al unir los componentes, reintente.'));
-      }
+      } 
     })
     .catch((error) => {
+      if (error.response.status === 404) {
+      } else if (error.response.status == 400){
+        dispatch(setComponentsJoined(true));
+        dispatch(notifyProductsJoined(payload.compressor_unit_serial));
+      }
+      console.log(error.response.status);
       // Manejo de errores, si es necesario
     });
     
