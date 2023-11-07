@@ -1,12 +1,13 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { endpointsCodes } from './endpointCodes';
-import { notifyError, notifyProductMounted, notifyProductUnmounted, notifyProductsJoined } from '../../partials/paletization/Toasts';
+import { notifyError, notifyGenealogyNotFound, notifyProductMounted, notifyProductUnmounted, notifyProductsJoined } from '../../partials/paletization/Toasts';
 
 const initialState = {
     pallet: {},
     components : [],
-    componentsJoined: false
+    componentsJoined: false,
+    genealogyData: {}
 }
 
 const palletsSlice = createSlice({
@@ -31,6 +32,9 @@ const palletsSlice = createSlice({
         },
         setComponentsJoined: (state, action) => {
           state.componentsJoined = action.payload;
+        },
+        setGenealogyData: (state, action) => {
+          state.genealogyData = action.payload;
         }
       },
 });
@@ -39,7 +43,8 @@ export const {
     setPallet,
     setComponents,
     unmountComponent,
-    setComponentsJoined
+    setComponentsJoined,
+    setGenealogyData
   } = palletsSlice.actions;
   
 
@@ -48,6 +53,8 @@ export const selectPallet = (state) => state.pallets.pallet;
 export const selectComponents = (state) => state.pallets.components;
 
 export const selectComponentsJoined = (state) => state.pallets.componentsJoined;
+
+export const selectGenealogyData = (state) => state.pallets.genealogyData;
 
 export default palletsSlice.reducer;
 
@@ -60,7 +67,8 @@ export const joinComponents = (payload) => (dispatch) => {
         notifyProductsJoined(payload.compressor_unit_serial)
         dispatch(setComponentsJoined(true));
         
-      } else {
+      } else if (response.status === 404) {
+        dispatch(setComponentsJoined(true));
         dispatch(notifyError('Hubo un error al unir los componentes, reintente.'));
       }
     })
@@ -69,6 +77,26 @@ export const joinComponents = (payload) => (dispatch) => {
     });
     
 };
+
+export const getCompressor = (condenserSerial) => async (dispatch) => {
+  try {
+    console.log("Validando condenser serial");
+    const response = await axios.get(`http://em10vs0010.embraco.com:8002/api/v1/genealogy/component/?condenser_unit_serial=${condenserSerial}`);
+    if (response.status === 200) {
+      // dispatch(setGenealogyData(response.data));
+      // dispatch(setComponentsJoined(true));
+      return response.data;
+    } else if (response.status === 404) {
+      console.log("No se encontró genealogía");
+      notifyGenealogyNotFound(condenserSerial);
+    }
+  } catch (error) {
+    console.log("Error al obtener la genealogía", error);
+    notifyGenealogyNotFound(condenserSerial);
+    // Manejo de errores, si es necesario
+  }
+};
+
 
 export const createPallet = (barcode, quantity) => (dispatch) => {
     //dispatch(setLoading(true));
@@ -123,22 +151,25 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
      .catch((error) => endpointsCodes(error, dispatch, setNotFound));
   }
 
-  export const mountComponent = (palletID, serial, condenserMaterial, compressorMaterial) => (dispatch) => {
+  export const mountComponent = (payload) => (dispatch) => {
+    const palletId = payload.palette;
     const data = {
-            pallet_id: palletID,
-            condenser_unit_serial: serial,
-            condenser_material_code: condenserMaterial,
-            compressor_unit_serial: serial,
-            compressor_material_code: compressorMaterial,
+            pallet_id: payload.palette,
+            condenser_unit_serial: payload.condenser,
+            condenser_material_code: payload.condenserMaterial,
+            compressor_unit_serial: payload.compressor,
+            compressor_material_code: payload.compressorMaterial,
             material_type: "-"
     }
+    console.log("Montando componente + ", data);
     axios
-      .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletID}/components/add/`, data)
+      .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletId}/components/add/`, data)
       .then((response) => {
+        console.log(response.status);
+        console.log("MANDANDO A ACTUALIZAR LOS COMPONENTS")
         if (response.status === 201) {
-            notifyProductMounted(serial)
-            console.log("MANDANDO A ACTUALIZAR LOS COMPONENTS")
-            dispatch(getAllComponents(palletID));
+            notifyProductMounted(payload.condenser)
+            dispatch(getAllComponents(palletId));
         } else {
           dispatch(setError('Hubo un error al montar el componente.'));
         }

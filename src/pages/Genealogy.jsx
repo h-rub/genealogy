@@ -65,8 +65,8 @@ function GenealogyDashboard() {
 
   const [mode, setMode] = useState("compressor");
 
-  const [barcodeProduct, setBarcodeProduct] = useState("Escanea un código");
-  const [barcodeCondenser, setBarcodeCondenser] = useState("Escanea un código");
+  const [barcodeProduct, setBarcodeProduct] = useState("Escanea compresor");
+  const [barcodeCondenser, setBarcodeCondenser] = useState("Escanea condensador");
 
   const [treeData, setTreeData] = useState([]);
 
@@ -271,8 +271,8 @@ function GenealogyDashboard() {
   function handleNew() {
     console.log("Handle new step");
     setMode("compressor");
-    setBarcodeProduct("Escanea un código");
-    setBarcodeCondenser("Escanea un código");
+    setBarcodeProduct("Escanea compresor");
+    setBarcodeCondenser("Escanea condesador");
     dispatch(setGlobalStatus(""));
     dispatch(setTestResults([]));
     dispatch(setComponentsJoined(false));
@@ -323,7 +323,7 @@ function GenealogyDashboard() {
   function handleOpenModalUnion(e) {
     setComponentsJoined(false);
     e.stopPropagation();
-    if (barcodeCondenser === "Escanea un código") {
+    if (barcodeCondenser === "Escanea condensador") {
       setCurrentStepIndexUnion(0);
     }
     setInfoModalOpen(true);
@@ -447,7 +447,7 @@ function GenealogyDashboard() {
                   <LabelPrinting
                     ref={labelRef}
                     qrValue={
-                      barcodeCondenser != "Escanea un código"
+                      barcodeCondenser != "Escanea condensador"
                         ? barcodeCondenser
                         : "12"
                     }

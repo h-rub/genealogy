@@ -81,11 +81,11 @@ function App() {
            
           },
           
-          duration: 5000,
+          duration: 2000,
 
           // Default options for specific types
           success: {
-            duration: 3000,
+            duration: 2000,
           },
         }}
       >

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import ReactToPrint from "react-to-print";
 
 import {
+  Add,
   Barcode,
   Box,
   Box1,
@@ -35,6 +36,8 @@ import {
   getTestResults,
   selectTestResults,
   selectGlobalStatus,
+  setGlobalStatus,
+  setTestResults,
 } from "../store/slice/testResultSlice";
 import {
   createPallet,
@@ -42,6 +45,8 @@ import {
   selectComponents,
   mountComponent,
   processInSAP,
+  getCompressor,
+  setComponentsJoined,
 } from "../store/slice/palletsSlice";
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
 import ComponentsTable from "../partials/paletization/ComponentsTable";
@@ -81,7 +86,7 @@ function PaletizationView() {
   };
 
   useScanDetection({
-    onComplete: (code) => {
+    onComplete: async (code) => {
       console.log(code);
       if (code.replace(/Shift/g, "").length >= 11) {
         // Si la cadena tiene al menos 9 caracteres, considerarla un ID de producto
@@ -106,27 +111,26 @@ function PaletizationView() {
         const compressorMaterial = orderSelected.components[0].matnr;
         // console.log("GLOBAL STATUS" + globalStatus);
         
-        // if (globalStatus === 0) {
-        //   setInfoModalOpen(true);
-        // } else if (globalStatus === 1) {
-        //   setInfoModalOpen(false);
-        //   dispatch(
-        //     mountComponent(
-        //       palletSelected.identifier,
-        //       code.replace(/Shift/g, ""),
-        //       condenserMaterial,
-        //       compressorMaterial
-        //     )
-        //   );
-      //}
-          dispatch(
-            mountComponent(
-              palletSelected.identifier,
-              code.replace(/Shift/g, ""),
-              condenserMaterial,
-              compressorMaterial
+      //   if (globalStatus === 0) {
+      //     setInfoModalOpen(true);
+      //   } else if (globalStatus === 1) {
+      //     setInfoModalOpen(false);
+          
+      // }
+      const response = await dispatch(getCompressor(code.replace(/Shift/g, "")));
+      const data = {
+        "palette": palletSelected.identifier,
+        "condenser": code.replace(/Shift/g, ""),
+        "compressor": response.compressor_unit_serial,
+        "compressorMaterial": compressorMaterial,
+        "condenserMaterial": condenserMaterial,
+      }
+      console.log(data);
+      dispatch(
+          mountComponent(
+             data
             )
-          );
+      );
 
        
         
@@ -232,6 +236,14 @@ function PaletizationView() {
 
   // }, []);
 
+  function handleNew() {
+    console.log("Handle new step");
+    setBarcodeProduct("Escanea producto");
+    dispatch(setGlobalStatus(""));
+    dispatch(setTestResults([]));
+    dispatch(setComponentsJoined(false));
+  }
+
   function buildTreeData(obj) {
     if (typeof obj === "undefined" || Object.keys(obj).length === 0) {
       console.log("Boom undefined");
@@ -312,11 +324,21 @@ function PaletizationView() {
                 </h3>
                 {/* Header: Right side */}
                 <div className="flex items-center space-x-3">
-                  <button className="border border-slate-300 rounded w-64 h-12 text-base flex justify-center font-semibold mr-2">
+                {Object.keys(orderSelected).length === 0 ? null : (
+                  <button
+                    onClick={handleNew}
+                    className="border border-slate-300 rounded w-32 h-12 text-base flex justify-center font-semibold"
+                  >
+                    <Add
+                      className="mr-2 my-auto bg-transparent"
+                      color="black"
+                      size={20}
+                    />
                     <span className="my-auto text-black font-semibold">
-                      Re-procesamiento
+                      Nuevo
                     </span>
                   </button>
+                )}
 
                   <button
                     onClick={
@@ -493,7 +515,7 @@ function PaletizationView() {
                 </section>
               </div>
 
-              <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4 w-3/4">
+              <section  style={{ maxHeight: "645px", minHeight: "200px", overflowY: "scroll" }} className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4 w-3/4">
                 <div className="bg-white p-5">
                   <h3 className="bg-white text-md font-medium text-gray">
                     Listado de componentes

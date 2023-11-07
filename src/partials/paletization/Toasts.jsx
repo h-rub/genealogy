@@ -13,6 +13,8 @@ export const notifyProductMounted = (code) => toast.success('Producto montado: '
 
 export const notifyProductsJoined= (code) => toast.success('Unión exitosa: ' + code, { style: {} });
 
+export const notifyGenealogyNotFound = (code) => toast.error('Genealogía no encontrada: ' + code);
+
 export const notifyProductUnmounted = (code) => toast.success('Producto desmontado: ' + code, { style: {} , icon: 'ℹ️' });
 
 // Toast de error
