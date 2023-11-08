@@ -136,7 +136,7 @@ function ComponentsTable({ selectedItems }) {
                   </div>
                 </th>
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                  <div className="font-semibold text-center">Tipo material</div>
+                  <div className="font-semibold text-center">SAP Status</div>
                 </th>
                 <th className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                   <div className="font-semibold text-center">Acciones</div>
@@ -157,7 +157,11 @@ function ComponentsTable({ selectedItems }) {
                         compUnitSerial={component.compressor_unit_serial}
                         condMaterialCode={component.condenser_material_code}
                         condUnitSerial={component.condenser_unit_serial}
+                        sendToSAP={component.send_to_sap}
+                        sapStatus={component.sap_status}
                         materialType={component.material_type}
+
+                        
                       />
                     );
                   })

@@ -307,10 +307,10 @@ function GenealogyDashboard() {
   function handleConfirmUnion(e) {
     e.stopPropagation();
     const payload = {
-      condenser_unit_serial: barcodeProduct,
+      condenser_unit_serial: barcodeCondenser,
       condenser_material_code: orderSelected.matnr.slice(-9),
       condenser_status_test: globalStatus === 1 ? true : false,
-      compressor_unit_serial: barcodeCondenser,
+      compressor_unit_serial: barcodeProduct,
       compressor_material_code: orderSelected.components[0]?.matnr,
     };
 
@@ -496,7 +496,7 @@ function GenealogyDashboard() {
                     <p className="bg-white text-3xl font-bold text-black">
                       {Object.keys(orderSelected).length === 0
                         ? "--------"
-                        : barcodeProduct}
+                        : barcodeProduct != "Escanea compresor" ? barcodeCondenser : barcodeProduct}
                     </p>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { endpointsCodes } from './endpointCodes';
-import { notifyError, notifyGenealogyNotFound, notifyProductMounted, notifyProductUnmounted, notifyProductsJoined } from '../../partials/paletization/Toasts';
+import { notifyError, notifyErrorInSAP, notifyGenealogyNotFound, notifyProductMounted, notifyProductUnmounted, notifyProductsJoined, notifySuccesInSAP } from '../../partials/paletization/Toasts';
 
 const initialState = {
     pallet: {},
@@ -64,7 +64,7 @@ export const joinComponents = (payload) => (dispatch) => {
     .post(`http://em10vs0010.embraco.com:8002/api/v1/genealogy/component/`, payload)
     .then((response) => {
       if (response.status === 201) {
-        notifyProductsJoined(payload.compressor_unit_serial)
+        notifyProductsJoined(payload.condenser_unit_serial)
         dispatch(setComponentsJoined(true));
         
       } 
@@ -73,7 +73,7 @@ export const joinComponents = (payload) => (dispatch) => {
       if (error.response.status === 404) {
       } else if (error.response.status == 400){
         dispatch(setComponentsJoined(true));
-        dispatch(notifyProductsJoined(payload.compressor_unit_serial));
+        dispatch(notifyProductsJoined(payload.condenser_unit_serial));
       }
       console.log(error.response.status);
       // Manejo de errores, si es necesario
@@ -206,22 +206,49 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
     const currentDatetime = new Date();
     const currentDate = currentDatetime.toISOString().split('T')[0];
     const currentTime = currentDatetime.toLocaleTimeString('en-US', { hour12: false });
-    const ItJsonInst = components.map((component) => ({
-      sernr: component.condenser_unit_serial,
-      serfi: component.compressor_unit_serial,
+    const ItJsonInst = components.filter((component) => !component.send_to_sap).map((component) => ({
+      sernr: component.condenser_unit_serial.slice(-8),
+      serfi: component.compressor_unit_serial.slice(-8),
       matnr: component.condenser_material_code,
       matfi: component.compressor_material_code,
       t: "S"
     }));
+    
 
     const xmlData = {
-      IArbpl: orderSelected.arbpl,
+      IArbpl: "MXCDU01",
       IAufnr: orderSelected.aufnr,
+      IMatnrDestino: orderSelected.matnr.slice(-9),
       ICharg: pallet.identifier,
       IDataProd: currentDate,
       IHoraProd: currentTime,
       IQuantProd: ItJsonInst.length,
+      INumin: "F",
       ItJsonInst: ItJsonInst
     };
     console.log(xmlData);
+  
+    axios
+      .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/sap/notifiy/`, xmlData)
+      .then((response) => {
+        console.log("MANDANDO A NOTIFICAR A SAP")
+        if (response.status === 200) {
+          console.log(response.data);
+          if (response.data.EMessage === "") {
+            console.log("Notificación exitosa")
+            notifySuccesInSAP(xmlData.ICharg);
+            dispatch(getAllComponents(pallet.identifier));
+          } else {
+            console.log("Error!")
+            console.log(response.data.EMessage)
+            notifyErrorInSAP(xmlData.ICharg, response.data.EMessage);
+          }
+        } else {
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        notifyErrorInSAP(xmlData.ICharg, error.message);
+        // Manejo de errores, si es necesario
+      });
   }

@@ -247,6 +247,14 @@ function PaletizationView() {
     dispatch(setComponents([]));
   }
 
+  function handleNotify() {
+    dispatch( processInSAP(
+      orderSelected,
+      palletSelected,
+      componentsList
+    ) )
+  }
+
   function buildTreeData(obj) {
     if (typeof obj === "undefined" || Object.keys(obj).length === 0) {
       console.log("Boom undefined");
@@ -343,29 +351,27 @@ function PaletizationView() {
                   </button>
                 )}
 
-                  <button
+                  {componentsList.length === 0? null : (<button
                     onClick={
-                      processInSAP(
-                        orderSelected,
-                        palletSelected,
-                        componentsList
-                      ) //
+                      handleNotify
+                     //
                     }
                     className={
-                      palletSelected.quantity == componentsList.length
-                        ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
-                        : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
+                      componentsList.some((component) => component.send_to_sap === false)
+                        ?"w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
+                        
+                        :  "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
                     }
                     disabled={
-                      palletSelected.quantity != componentsList.length
-                        ? true
-                        : false
+                      componentsList.some((component) => component.send_to_sap === false)
+                        ? false
+                        : true
                     }
                   >
                     <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
                       Procesar
                     </span>
-                  </button>
+                  </button>)}
                 </div>
               </div>
             </div>

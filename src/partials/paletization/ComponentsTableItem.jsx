@@ -7,6 +7,7 @@ import { setOrderSelected, getMetadataFromOrder } from '../../store/slice/orderS
 import { addEvent } from '../../store/slice/eventsLogSlice';
 import { unmountComponent, unmountComponentAPI, selectPallet } from '../../store/slice/palletsSlice';
 import ModalBlank from '../../components/ModalBlank';
+import { Check, Clock, Verify, Warning2 } from 'iconsax-react';
 
 function ComponentsItem(props) {
   const dispatch = useDispatch();
@@ -43,11 +44,11 @@ function ComponentsItem(props) {
         <div className="text-left text-md font-medium text-gray">{props.compUnitSerial}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-        <div className="text-center font-medium text-gray">{props.materialType}</div>
+        <div className="text-center font-medium text-gray">{props.sendToSAP === true ? <div className='flex'><Verify className="mr-2" color="#009B4A" size={20}/><p className='text-primary'>{props.sapStatus}</p></div> : <div className='flex text-center'><Clock className="mr-2" color="gray" size={20} /> Pendiente</div>}</div>
       </td>
       <td className="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
         {/* Menu button */}
-        <button aria-controls="danger-modal" onClick={(e) => { e.stopPropagation(); setDangerModalOpen(true); }} className="text-center font-semibold text-red-500">Desmontar</button>
+        {props.sendToSAP ? null : <button aria-controls="danger-modal" onClick={(e) => { e.stopPropagation(); setDangerModalOpen(true); }} className="text-center font-semibold text-red-500">Desmontar</button>}
       </td>
     </tr>
      {/* Danger Modal */}

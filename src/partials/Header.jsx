@@ -5,7 +5,7 @@ import UserMenu from "../components/DropdownProfile";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Add, Barcode, Grid2, Grid8, Note, Notepad2 } from "iconsax-react";
+import { Add, Barcode, BoxSearch, Grid2, Grid8, Note, Notepad2 } from "iconsax-react";
 
 import { selectOpenOrdersList } from "../store/slice/ordersSlice";
 
@@ -86,8 +86,8 @@ function Header({
                   className="flex bg-black hover:text-hoverTextSidebar transition duration-500 easy-in-out text-white font-semibold lg:mr-7"
                 >
                   {" "}
-                  <Add className="bg-black mr-2" color="#ffff" size={24} />
-                  Solicitudes
+                  <BoxSearch className="bg-black mr-2" color="#ffff" size={24} />
+                  Logs
                 </a>
               </div>
               <div className="bg-black my-auto">
