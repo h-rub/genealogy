@@ -82,6 +82,8 @@ function PaletizationView() {
 
   const componentsList = useSelector(selectComponents);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleSelectedItems = (selectedItems) => {
     setSelectedItems([...selectedItems]);
   };
@@ -92,18 +94,19 @@ function PaletizationView() {
       if (code.replace(/Shift/g, "").length >= 11) {
         // Si la cadena tiene al menos 9 caracteres, considerarla un ID de producto
         const codeScannedEvent = {
-          text: "Producto escaneado: " + code.replace(/Shift/g, ""),
+          text:
+            "Producto escaneado: " + code.replace(/Shift/g, "").toUpperCase(),
           timestamp: new Date().toISOString(),
         };
-        notifyProductScanned(code.replace(/Shift/g, ""));
-        setBarcodeProduct(code.replace(/Shift/g, ""));
+        notifyProductScanned(code.replace(/Shift/g, "").toUpperCase());
+        setBarcodeProduct(code.replace(/Shift/g, "").toUpperCase());
         dispatch(addEvent(codeScannedEvent));
-        dispatch(getTestResults(code.replace(/Shift/g, "")));
+        dispatch(getTestResults(code.replace(/Shift/g, "").toUpperCase()));
 
         const getTestResultsEvent = {
           text:
             "Consultando resultados de prueba de producto: " +
-            code.replace(/Shift/g, ""),
+            code.replace(/Shift/g, "").toUpperCase(),
           timestamp: new Date().toISOString(),
         };
 
@@ -111,45 +114,42 @@ function PaletizationView() {
         const condenserMaterial = orderSelected.matnr.slice(-9);
         const compressorMaterial = orderSelected.components[0].matnr;
         // console.log("GLOBAL STATUS" + globalStatus);
-        
-      //   if (globalStatus === 0) {
-      //     setInfoModalOpen(true);
-      //   } else if (globalStatus === 1) {
-      //     setInfoModalOpen(false);
-          
-      // }
-      const response = await dispatch(getCompressor(code.replace(/Shift/g, "")));
-      const data = {
-        "palette": palletSelected.identifier,
-        "condenser": code.replace(/Shift/g, ""),
-        "compressor": response.compressor_unit_serial,
-        "compressorMaterial": compressorMaterial,
-        "condenserMaterial": condenserMaterial,
-      }
-      console.log(data);
-      dispatch(
-          mountComponent(
-             data
-            )
-      );
 
-       
-        
+        //   if (globalStatus === 0) {
+        //     setInfoModalOpen(true);
+        //   } else if (globalStatus === 1) {
+        //     setInfoModalOpen(false);
+
+        // }
+        const response = await dispatch(
+          getCompressor(code.replace(/Shift/g, "").toUpperCase())
+        );
+        const data = {
+          palette: palletSelected.identifier,
+          condenser: code.replace(/Shift/g, "").toUpperCase(),
+          compressor: response.compressor_unit_serial,
+          compressorMaterial: compressorMaterial,
+          condenserMaterial: condenserMaterial,
+        };
+        console.log(data);
+        dispatch(mountComponent(data));
       } else {
         // Si la cadena es más corta, considerarla un ID de pallet
         const codeScannedEvent = {
-          text: "Pallet escaneado: " + code.replace(/Shift/g, ""),
+          text: "Pallet escaneado: " + code.replace(/Shift/g, "").toUpperCase(),
           timestamp: new Date().toISOString(),
         };
-        setBarcodePallet(code.replace(/Shift/g, ""));
+        setBarcodePallet(code.replace(/Shift/g, "").toUpperCase());
         dispatch(addEvent(codeScannedEvent));
-        dispatch(createPallet(code.replace(/Shift/g, "")));
+        dispatch(createPallet(code.replace(/Shift/g, "").toUpperCase()));
 
         const createPalletEvent = {
-          text: "Consultando registro de Pallet: " + code.replace(/Shift/g, ""),
+          text:
+            "Consultando registro de Pallet: " +
+            code.replace(/Shift/g, "").toUpperCase(),
           timestamp: new Date().toISOString(),
         };
-        notifyPalletScanned(code.replace(/Shift/g, ""));
+        notifyPalletScanned(code.replace(/Shift/g, "").toUpperCase());
 
         dispatch(addEvent(createPalletEvent));
       }
@@ -248,11 +248,15 @@ function PaletizationView() {
   }
 
   function handleNotify() {
-    dispatch( processInSAP(
-      orderSelected,
-      palletSelected,
-      componentsList
-    ) )
+    setIsLoading(true); // Establecer isLoading a true al iniciar la carga
+
+    dispatch(processInSAP(orderSelected, palletSelected, componentsList))
+      .then(() => {
+        setIsLoading(false); // Establece isLoading a false al finalizar la carga
+      })
+      .catch(() => {
+        setIsLoading(false); // En caso de error, también establece isLoading a false
+      });
   }
 
   function buildTreeData(obj) {
@@ -335,43 +339,72 @@ function PaletizationView() {
                 </h3>
                 {/* Header: Right side */}
                 <div className="flex items-center space-x-3">
-                {Object.keys(orderSelected).length === 0 ? null : (
-                  <button
-                    onClick={handleNew}
-                    className="border border-slate-300 rounded w-32 h-12 text-base flex justify-center font-semibold"
-                  >
-                    <Add
-                      className="mr-2 my-auto bg-transparent"
-                      color="black"
-                      size={20}
-                    />
-                    <span className="my-auto text-black font-semibold">
-                      Nuevo
-                    </span>
-                  </button>
-                )}
+                  {Object.keys(orderSelected).length === 0 ? null : (
+                    <button
+                      onClick={handleNew}
+                      className="border border-slate-300 rounded w-32 h-12 text-base flex justify-center font-semibold"
+                    >
+                      <Add
+                        className="mr-2 my-auto bg-transparent"
+                        color="black"
+                        size={20}
+                      />
+                      <span className="my-auto text-black font-semibold">
+                        Nuevo
+                      </span>
+                    </button>
+                  )}
 
-                  {componentsList.length === 0? null : (<button
-                    onClick={
-                      handleNotify
-                     //
-                    }
-                    className={
-                      componentsList.some((component) => component.send_to_sap === false)
-                        ?"w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
-                        
-                        :  "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
-                    }
-                    disabled={
-                      componentsList.some((component) => component.send_to_sap === false)
-                        ? false
-                        : true
-                    }
-                  >
-                    <span className="bg-transparent my-auto text-white font-semibold hover:bg-green-500">
-                      Procesar
-                    </span>
-                  </button>)}
+                  {componentsList.length === 0 ? null : (
+                    isLoading ? (<button
+                      onClick={
+                        handleNotify
+                        //
+                      }
+                      className={
+                         "w-64 h-12 btn bg-primary text-white disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed shadow-none"
+                      }
+                      disabled={
+                           true
+                      }
+                    >
+                    <svg
+                        className="animate-spin bg-transparent w-4 h-4 fill-current shrink-0 mr-2"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M8 16a7.928 7.928 0 01-3.428-.77l.857-1.807A6.006 6.006 0 0014 8c0-3.309-2.691-6-6-6a6.006 6.006 0 00-5.422 8.572l-1.806.859A7.929 7.929 0 010 8c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z" />
+                      </svg>
+                      <span className="bg-transparent my-auto text-white font-semibold">
+                        Cargando...
+                      </span>
+                    </button>) : (
+                      <button
+                      onClick={
+                        handleNotify
+                        //
+                      }
+                      className={
+                        componentsList.some(
+                          (component) => component.send_to_sap === false
+                        )
+                          ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
+                          : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
+                      }
+                      disabled={
+                        componentsList.some(
+                          (component) => component.send_to_sap === false
+                        )
+                          ? false
+                          : true
+                      }
+                    >
+                    
+                      <span className="bg-transparent my-auto text-white font-semibold">
+                        Procesar
+                      </span>
+                    </button>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -524,7 +557,14 @@ function PaletizationView() {
                 </section>
               </div>
 
-              <section  style={{ maxHeight: "645px", minHeight: "200px", overflowY: "scroll" }} className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4 w-3/4">
+              <section
+                style={{
+                  maxHeight: "645px",
+                  minHeight: "200px",
+                  overflowY: "scroll",
+                }}
+                className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:my-4 w-3/4"
+              >
                 <div className="bg-white p-5">
                   <h3 className="bg-white text-md font-medium text-gray">
                     Listado de componentes
@@ -626,7 +666,7 @@ function PaletizationView() {
           </div>
         </div>
       </div>
-     
+
       <ModalBlank
         id="info-modal"
         modalOpen={infoModalOpen}
@@ -654,7 +694,9 @@ function PaletizationView() {
             <div className="text-sm mb-10 text-left">
               <div className="space-y-2">
                 <p>
-                  El componente no puede ser montado ya que hay uno o más errores en sus pruebas, es posible que el componente se encuentre dañado:
+                  El componente no puede ser montado ya que hay uno o más
+                  errores en sus pruebas, es posible que el componente se
+                  encuentre dañado:
                 </p>
                 <h3 className="bg-white text-md font-medium text-gray">
                   Semáforo
@@ -702,7 +744,13 @@ function PaletizationView() {
             </div>
             {/* Modal footer */}
             <div className="flex flex-wrap justify-end">
-              <button className="btn-sm bg-primary hover:primary text-white" onClick={(e) => { e.stopPropagation(); setInfoModalOpen(false); }}>
+              <button
+                className="btn-sm bg-primary hover:primary text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setInfoModalOpen(false);
+                }}
+              >
                 Entendido
               </button>
             </div>

@@ -234,9 +234,9 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
         console.log("MANDANDO A NOTIFICAR A SAP")
         if (response.status === 200) {
           console.log(response.data);
-          if (response.data.EMessage === "") {
+          if (response.data.EMessage.length >= 1) {
             console.log("Notificación exitosa")
-            notifySuccesInSAP(xmlData.ICharg);
+            notifySuccesInSAP(xmlData.ICharg, response.data.EMessage);
             dispatch(getAllComponents(pallet.identifier));
           } else {
             console.log("Error!")

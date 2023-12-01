@@ -95,22 +95,22 @@ function GenealogyDashboard() {
       if (mode === "compressor") {
         console.log(code);
         const codeScannedEvent = {
-          text: "Compresor escaneado: " + code.replace(/Shift/g, ""),
+          text: "Compresor escaneado: " + code.replace(/Shift/g, "").toUpperCase(),
           timestamp: new Date().toISOString(),
         };
-        notifyProductScanned(code.replace(/Shift/g, ""));
-        setBarcodeProduct(code.replace(/Shift/g, ""));
+        notifyProductScanned(code.replace(/Shift/g, "").toUpperCase());
+        setBarcodeProduct(code.replace(/Shift/g, "").toUpperCase());
         setInfoModalOpen(true);
         dispatch(addEvent(codeScannedEvent));
         setMode("condenser");
       } else if (mode === "condenser") {
         const codeScannedEvent = {
-          text: "Condensador escaneado: " + code.replace(/Shift/g, ""),
+          text: "Condensador escaneado: " + code.replace(/Shift/g, "").toUpperCase(),
           timestamp: new Date().toISOString(),
         };
-        setBarcodeCondenser(code.replace(/Shift/g, ""));
-        notifyCondenserScanned(code.replace(/Shift/g, ""));
-        dispatch(getTestResults(code.replace(/Shift/g, "")));
+        setBarcodeCondenser(code.replace(/Shift/g, "").toUpperCase());
+        notifyCondenserScanned(code.replace(/Shift/g, "").toUpperCase());
+        dispatch(getTestResults(code.replace(/Shift/g, "").toUpperCase()));
         dispatch(addEvent(codeScannedEvent));
         const getCondenserTestResultsEvent = {
           text:
