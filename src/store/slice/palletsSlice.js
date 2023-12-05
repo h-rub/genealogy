@@ -7,7 +7,8 @@ const initialState = {
     pallet: {},
     components : [],
     componentsJoined: false,
-    genealogyData: {}
+    genealogyData: {},
+    loadingProcessInSap: false,
 }
 
 const palletsSlice = createSlice({
@@ -35,7 +36,10 @@ const palletsSlice = createSlice({
         },
         setGenealogyData: (state, action) => {
           state.genealogyData = action.payload;
-        }
+        },
+        setLoadingProcessInSap: (state, action) => {
+          state.loadingProcessInSap = action.payload;
+        },
       },
 });
 
@@ -44,7 +48,8 @@ export const {
     setComponents,
     unmountComponent,
     setComponentsJoined,
-    setGenealogyData
+    setGenealogyData,
+    setLoadingProcessInSap
   } = palletsSlice.actions;
   
 
@@ -55,6 +60,8 @@ export const selectComponents = (state) => state.pallets.components;
 export const selectComponentsJoined = (state) => state.pallets.componentsJoined;
 
 export const selectGenealogyData = (state) => state.pallets.genealogyData;
+
+export const selectLoadingProcessInSap = (state) => state.pallets.loadingProcessInSap;
 
 export default palletsSlice.reducer;
 
@@ -203,6 +210,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
   };
 
   export const processInSAP = (orderSelected, pallet, components) => (dispatch) => {
+    dispatch(setLoadingProcessInSap(true));
     const currentDatetime = new Date();
     const currentDate = currentDatetime.toISOString().split('T')[0];
     const currentTime = currentDatetime.toLocaleTimeString('en-US', { hour12: false });
@@ -227,18 +235,21 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
       ItJsonInst: ItJsonInst
     };
     console.log(xmlData);
+    
   
     axios
       .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/sap/notifiy/`, xmlData)
       .then((response) => {
         console.log("MANDANDO A NOTIFICAR A SAP")
         if (response.status === 200) {
+          dispatch(setLoadingProcessInSap(false));
           console.log(response.data);
-          if (response.data.EMessage.length >= 1) {
+          if (response.data.EMessage === "Process Notification executed successfully") {
             console.log("Notificación exitosa")
             notifySuccesInSAP(xmlData.ICharg, response.data.EMessage);
             dispatch(getAllComponents(pallet.identifier));
           } else {
+            dispatch(setLoadingProcessInSap(false));
             console.log("Error!")
             console.log(response.data.EMessage)
             notifyErrorInSAP(xmlData.ICharg, response.data.EMessage);
@@ -247,6 +258,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
         }
       })
       .catch((error) => {
+        dispatch(setLoadingProcessInSap(false));
         console.log(error);
         notifyErrorInSAP(xmlData.ICharg, error.message);
         // Manejo de errores, si es necesario

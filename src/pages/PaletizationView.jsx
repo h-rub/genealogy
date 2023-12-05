@@ -48,6 +48,7 @@ import {
   getCompressor,
   setComponentsJoined,
   setComponents,
+  selectLoadingProcessInSap
 } from "../store/slice/palletsSlice";
 import LabelPrinting from "../partials/genealogy/LabelPrinting";
 import ComponentsTable from "../partials/paletization/ComponentsTable";
@@ -82,7 +83,8 @@ function PaletizationView() {
 
   const componentsList = useSelector(selectComponents);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = useSelector(selectLoadingProcessInSap);
+  
 
   const handleSelectedItems = (selectedItems) => {
     setSelectedItems([...selectedItems]);
@@ -248,15 +250,7 @@ function PaletizationView() {
   }
 
   function handleNotify() {
-    setIsLoading(true); // Establecer isLoading a true al iniciar la carga
-
-    dispatch(processInSAP(orderSelected, palletSelected, componentsList))
-      .then(() => {
-        setIsLoading(false); // Establece isLoading a false al finalizar la carga
-      })
-      .catch(() => {
-        setIsLoading(false); // En caso de error, también establece isLoading a false
-      });
+    dispatch(processInSAP(orderSelected, palletSelected, componentsList));
   }
 
   function buildTreeData(obj) {

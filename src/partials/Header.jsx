@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Add, Barcode, BoxSearch, Grid2, Grid8, Note, Notepad2 } from "iconsax-react";
 
-import { selectOpenOrdersList } from "../store/slice/ordersSlice";
+import { selectOpenOrdersList, getOpenOrdersList } from "../store/slice/ordersSlice";
 
 function Header({
   sidebarOpen,
@@ -23,7 +23,9 @@ function Header({
   const openOrdersList = useSelector(selectOpenOrdersList);
 
   const handleClick = (e) => {
+    console.log("Open orders list");
     e.stopPropagation();
+    dispatch(getOpenOrdersList());
     if (openOrdersList.length > 0) {
       setBasicModalOpen(true);
     }
