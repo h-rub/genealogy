@@ -219,7 +219,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
       serfi: component.compressor_unit_serial.slice(-8),
       matnr: component.condenser_material_code,
       matfi: component.compressor_material_code,
-      t: "S"
+      type: "S"
     }));
     
 
