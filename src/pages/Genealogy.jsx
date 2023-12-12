@@ -428,7 +428,7 @@ function GenealogyDashboard() {
                           ? "w-64 h-12 bg-primary rounded text-white text-base flex justify-center hover:bg-green-500"
                           : "w-64 h-12 bg-secondary rounded text-black text-base flex justify-center hover:text-white disabled:pointer-events-none"
                       }
-                      disabled={globalStatus !== 1 && componentsJoined}
+                      disabled={globalStatus != 1 && !componentsJoined}
                     >
                       <Barcode
                         className="mr-2 my-auto bg-transparent"
