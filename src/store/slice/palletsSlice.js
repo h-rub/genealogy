@@ -261,6 +261,5 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
         dispatch(setLoadingProcessInSap(false));
         console.log(error);
         notifyErrorInSAP(xmlData.ICharg, error.message);
-        // Manejo de errores, si es necesario
       });
   }

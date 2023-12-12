@@ -115,7 +115,7 @@ function GenealogyDashboard() {
         const getCondenserTestResultsEvent = {
           text:
             "Consultando resultados de prueba de condensador: " +
-            code.replace(/Shift/g, ""),
+            code.replace(/Shift/g, "").toUpperCase(),
           timestamp: new Date().toISOString(),
         };
         dispatch(addEvent(getCondenserTestResultsEvent));
@@ -449,7 +449,7 @@ function GenealogyDashboard() {
                     qrValue={
                       barcodeCondenser != "Escanea condensador"
                         ? barcodeCondenser
-                        : "12"
+                        : "ERR"
                     }
                     metadata={metadata}
                   />
