@@ -31,7 +31,7 @@ import {
   metadataOrderSelected,
 } from "../store/slice/orderSelectedSlice";
 
-import { selectEventsLog, addEvent } from "../store/slice/eventsLogSlice";
+import { addEventToPaletizationLog, selectPaletizationLog } from "../store/slice/eventsLogSlice";
 import {
   getTestResults,
   selectTestResults,
@@ -64,7 +64,7 @@ function PaletizationView() {
   const globalStatus = useSelector(selectGlobalStatus);
   const orderSelected = useSelector(selectOrderSelected);
   const metadata = useSelector(metadataOrderSelected);
-  const eventsLog = useSelector(selectEventsLog);
+  const paletizationLog = useSelector(selectPaletizationLog);
 
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
@@ -93,6 +93,9 @@ function PaletizationView() {
   useScanDetection({
     onComplete: async (code) => {
       console.log(code);
+      if(code.replace(/Shift/g, "").toUpperCase() === "NEW"){
+        handleNew();
+      }
       if (code.replace(/Shift/g, "").length >= 11) {
         // Si la cadena tiene al menos 9 caracteres, considerarla un ID de producto
         const codeScannedEvent = {
@@ -102,7 +105,7 @@ function PaletizationView() {
         };
         notifyProductScanned(code.replace(/Shift/g, "").toUpperCase());
         setBarcodeProduct(code.replace(/Shift/g, "").toUpperCase());
-        dispatch(addEvent(codeScannedEvent));
+        dispatch(addEventToPaletizationLog(codeScannedEvent));
         dispatch(getTestResults(code.replace(/Shift/g, "").toUpperCase()));
 
         const getTestResultsEvent = {
@@ -112,7 +115,7 @@ function PaletizationView() {
           timestamp: new Date().toISOString(),
         };
 
-        dispatch(addEvent(getTestResultsEvent));
+        dispatch(addEventToPaletizationLog(getTestResultsEvent));
         const condenserMaterial = orderSelected.matnr.slice(-9);
         const compressorMaterial = orderSelected.components[0].matnr;
         // console.log("GLOBAL STATUS" + globalStatus);
@@ -142,7 +145,7 @@ function PaletizationView() {
           timestamp: new Date().toISOString(),
         };
         setBarcodePallet(code.replace(/Shift/g, "").toUpperCase());
-        dispatch(addEvent(codeScannedEvent));
+        dispatch(addEventToPaletizationLog(codeScannedEvent));
         dispatch(createPallet(code.replace(/Shift/g, "").toUpperCase()));
 
         const createPalletEvent = {
@@ -153,7 +156,7 @@ function PaletizationView() {
         };
         notifyPalletScanned(code.replace(/Shift/g, "").toUpperCase());
 
-        dispatch(addEvent(createPalletEvent));
+        dispatch(addEventToPaletizationLog(createPalletEvent));
       }
     },
   });
@@ -323,7 +326,7 @@ function PaletizationView() {
 
   return (
     <>
-      <div className="px-4 sm:px-6 lg:px-8 py-2 w-full max-w-9xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-8 py-2 w-full max-w-10xl mx-auto">
         <div className="max-w-full mx-4 py-0 sm:mx-auto sm:px-6 lg:px-4">
           <header>
             <div className="mt-8">
@@ -595,12 +598,14 @@ function PaletizationView() {
                   className="bg-white text-sm text-black"
                   style={{ maxHeight: "450px", overflowY: "auto" }}
                 >
-                  {eventsLog
+                 {paletizationLog
                     .slice()
                     .reverse()
-                    .map((event, index) => (
-                      <p key={index}>
-                        {" "}
+                    .map((event, index, array) => (
+                      <p
+                        key={index}
+                        style={{ fontWeight: index === 0 ? "bold" : "normal" }}
+                      >
                         <span style={{ color: "green" }}>
                           {formatTimestampToDDMMYYYYHHMMSS(event.timestamp)}
                         </span>{" "}
