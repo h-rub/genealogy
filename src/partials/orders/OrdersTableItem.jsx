@@ -8,6 +8,7 @@ import {
 } from "../../store/slice/orderSelectedSlice";
 import { notifyOrderSelected } from "../paletization/Toasts";
 import { saveEvent } from "../../store/addEvent";
+import { componentsInOrderList, countComponentsJoinedInOrder, setChartDataOrderProgress } from "../../store/slice/palletsSlice";
 
 function OrdersTableItem(props) {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ function OrdersTableItem(props) {
           <button
             onClick={() => {
               const eventOrderSelected = {
-                text: "Orden " + props.id + " seleccionada",
+                text: "Órden " + props.id + " seleccionada",
                 timestamp: new Date().toISOString(),
               };
               console.log(props);
@@ -39,6 +40,8 @@ function OrdersTableItem(props) {
                 cancelable: true,
               });
               document.dispatchEvent(escapeKeyEvent);
+              dispatch(countComponentsJoinedInOrder(props.id))      
+              dispatch(componentsInOrderList(props.id));
             }}
           >
             <a className="font-medium text-primary hover:text-primary ">

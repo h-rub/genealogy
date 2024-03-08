@@ -2,6 +2,7 @@ import { createAction, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { endpointsCodes } from './endpointCodes';
 import { notifyError, notifyErrorInSAP, notifyGenealogyNotFound, notifyProductMounted, notifyProductUnmounted, notifyProductsJoined, notifySuccesInSAP } from '../../partials/paletization/Toasts';
+import { tailwindConfig } from '../../utils/Utils';
 
 const initialState = {
     pallet: {},
@@ -9,6 +10,44 @@ const initialState = {
     componentsJoined: false,
     genealogyData: {},
     loadingProcessInSap: false,
+    componentsCount: 0,
+    componentsInOrderList: [],
+    chartDataOrderProgress: {
+        labels: [
+          ''
+        ],
+        datasets: [
+          // Blue bars
+          {
+            label: 'Planeado',
+            data: [
+              0
+            ],
+            backgroundColor: tailwindConfig().theme.colors.blue[500],
+            hoverBackgroundColor: tailwindConfig().theme.colors.indigo[600],
+            categoryPercentage: 0.66,
+          },
+          // Light blue bars
+          {
+            label: 'Apuntado',
+            data: [
+              0
+            ],
+            backgroundColor: tailwindConfig().theme.colors.sky[400],
+            hoverBackgroundColor: tailwindConfig().theme.colors.sky[500],
+            categoryPercentage: 0.66,
+          },
+          {
+            label: 'Realizado',
+            data: [
+              0,
+            ],
+            backgroundColor: '#009B4A',
+            hoverBackgroundColor: '#009B4A',
+            categoryPercentage: 0.66,
+          },
+        ],
+    }
 }
 
 const palletsSlice = createSlice({
@@ -40,6 +79,15 @@ const palletsSlice = createSlice({
         setLoadingProcessInSap: (state, action) => {
           state.loadingProcessInSap = action.payload;
         },
+        setComponentsCount: (state, action) => {
+          state.componentsCount = action.payload;
+        },
+        setComponentsInOrderList: (state, action) => {
+          state.componentsInOrderList = action.payload;
+        },
+        setChartDataOrderProgress: (state, action) => {
+          state.chartDataOrderProgress = action.payload;
+        }
       },
 });
 
@@ -49,7 +97,10 @@ export const {
     unmountComponent,
     setComponentsJoined,
     setGenealogyData,
-    setLoadingProcessInSap
+    setLoadingProcessInSap,
+    setComponentsCount,
+    setComponentsInOrderList,
+    setChartDataOrderProgress
   } = palletsSlice.actions;
   
 
@@ -63,16 +114,24 @@ export const selectGenealogyData = (state) => state.pallets.genealogyData;
 
 export const selectLoadingProcessInSap = (state) => state.pallets.loadingProcessInSap;
 
+export const selectComponentsCount = (state) => state.pallets.componentsCount;
+
+export const selectComponentsInOrderList = (state) => state.pallets.componentsInOrderList;
+
+export const selectChartDataOrderProgress = (state) => state.pallets.chartDataProgress;
+
 export default palletsSlice.reducer;
 
 export const joinComponents = (payload) => (dispatch) => {
  
   axios
-    .post(`http://em10vs0010.embraco.com:8002/api/v1/genealogy/component/`, payload)
+    .post(`http://10.13.225.20:8002/api/v1/genealogy/component/`, payload)
     .then((response) => {
       if (response.status === 201) {
         notifyProductsJoined(payload.condenser_unit_serial)
         dispatch(setComponentsJoined(true));
+        dispatch(countComponentsJoinedInOrder(payload.order));
+        dispatch(componentsInOrderList(payload.order));
         
       } 
     })
@@ -88,10 +147,58 @@ export const joinComponents = (payload) => (dispatch) => {
     
 };
 
+export const countComponentsJoinedInOrder = (order) => (dispatch) => {
+
+  axios
+    .get(`http://10.13.225.20:8002/api/v1/genealogy/component/?order=${order}&mode=count`,)
+    .then((response) => {
+      if (response.status === 200) {
+        console.log(response.data.total);
+
+        if('total' in response.data){
+          dispatch(setComponentsCount(response.data.total));
+        }
+        
+      } 
+    })
+    .catch((error) => {
+      if (error.response.status === 404) {
+      } else if (error.response.status == 400){
+      }
+      console.log(error.response.status);
+      // Manejo de errores, si es necesario
+    });
+    
+};
+
+export const componentsInOrderList = (order) => (dispatch) => {
+
+  axios
+    .get(`http://10.13.225.20:8002/api/v1/genealogy/component/?order=${order}&mode=list`,)
+    .then((response) => {
+      if (response.status === 200) {
+        console.log(response.data);
+
+        if(response.data.length > 0) {
+          dispatch(setComponentsInOrderList(response.data));
+        }
+        
+      } 
+    })
+    .catch((error) => {
+      if (error.response.status === 404) {
+      } else if (error.response.status == 400){
+      }
+      console.log(error.response.status);
+      // Manejo de errores, si es necesario
+    });
+    
+};
+
 export const getCompressor = (condenserSerial) => async (dispatch) => {
   try {
     console.log("Validando condenser serial");
-    const response = await axios.get(`http://em10vs0010.embraco.com:8002/api/v1/genealogy/component/?condenser_unit_serial=${condenserSerial}`);
+    const response = await axios.get(`http://10.13.225.20:8002/api/v1/genealogy/component/?condenser_unit_serial=${condenserSerial}`);
     if (response.status === 200) {
       // dispatch(setGenealogyData(response.data));
       // dispatch(setComponentsJoined(true));
@@ -120,7 +227,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
         quantity: quantity
     }
     axios
-      .post('http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/', palletData)
+      .post('http://10.13.225.20:8002/api/v1/paletization/pallets/', palletData)
       .then((response) => {
         if (response.status === 201) {
           //dispatch(setLoading(false));
@@ -148,7 +255,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
     // };
     // dispatch(addEvent(startFetchOrders));
     axios
-     .get(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletIdentifier}/components/`)
+     .get(`http://10.13.225.20:8002/api/v1/paletization/pallets/${palletIdentifier}/components/`)
      .then((response) => {
         if (response.status === 200) {
           //dispatch(setLoading(false));
@@ -173,7 +280,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
     }
     console.log("Montando componente + ", data);
     axios
-      .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletId}/components/add/`, data)
+      .post(`http://10.13.225.20:8002/api/v1/paletization/pallets/${palletId}/components/add/`, data)
       .then((response) => {
         console.log(response.status);
         console.log("MANDANDO A ACTUALIZAR LOS COMPONENTS")
@@ -194,7 +301,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
   export const unmountComponentAPI = (palletIdentifier, component) => (dispatch) => {
     // Realiza una solicitud DELETE para desmontar el componente
     axios
-      .delete(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/${palletIdentifier}/components/${component.id}/dismount/`)
+      .delete(`http://10.13.225.20:8002/api/v1/paletization/pallets/${palletIdentifier}/components/${component.id}/dismount/`)
       .then((response) => {
         if (response.status === 204) {
             notifyProductUnmounted(component.compUnitSerial);
@@ -238,7 +345,7 @@ export const createPallet = (barcode, quantity) => (dispatch) => {
     
   
     axios
-      .post(`http://em10vs0010.embraco.com:8002/api/v1/paletization/pallets/sap/notifiy/`, xmlData)
+      .post(`http://10.13.225.20:8002/api/v1/paletization/pallets/sap/notifiy/`, xmlData)
       .then((response) => {
         console.log("MANDANDO A NOTIFICAR A SAP")
         if (response.status === 200) {

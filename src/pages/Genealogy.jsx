@@ -49,9 +49,16 @@ import ModalBlank from "../components/ModalBlank";
 import ModalAction from "../components/ModalAction";
 import {
   joinComponents,
+  selectChartDataOrderProgress,
+  selectComponentsCount,
   selectComponentsJoined,
+  setChartDataOrderProgress,
   setComponentsJoined,
 } from "../store/slice/palletsSlice";
+import ComponentsTable from "../partials/genealogy/ComponentsTable";
+import PolarChart from "../charts/PolarChart";
+import { hexToRGB, tailwindConfig } from "../utils/Utils";
+import BarChart04 from "../charts/BarChart04";
 
 function GenealogyDashboard() {
   const testResultsList = useSelector(selectTestResults);
@@ -60,6 +67,7 @@ function GenealogyDashboard() {
   const metadata = useSelector(metadataOrderSelected);
   const genealogyLog = useSelector(selectGenealogyLog);
   const componentsJoined = useSelector(selectComponentsJoined);
+  const componentsCount = useSelector(selectComponentsCount);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   const [hasChildrenAssociated, setHasChildrenAssociated] = useState(false);
@@ -77,7 +85,59 @@ function GenealogyDashboard() {
 
   const labelRef = useRef();
 
-  const [currentStepIndexUnion, setCurrentStepIndexUnion] = useState(1);
+  const [currentStepIndexUnion, setCurrentStepIndexUnion] = useState(1)
+
+  const [chartData, setChartData] = useState(
+    {
+      labels: [
+        ''
+      ],
+      datasets: [
+        // Blue bars
+        {
+          label: 'Planeado',
+          data: [
+            0
+          ],
+          backgroundColor: tailwindConfig().theme.colors.blue[500],
+          hoverBackgroundColor: tailwindConfig().theme.colors.indigo[600],
+          categoryPercentage: 0.66,
+        },
+        // Light blue bars
+        {
+          label: 'Apuntado',
+          data: [
+            0
+          ],
+          backgroundColor: tailwindConfig().theme.colors.sky[400],
+          hoverBackgroundColor: tailwindConfig().theme.colors.sky[500],
+          categoryPercentage: 0.66,
+        },
+        {
+          label: 'Realizado',
+          data: [
+            0,
+          ],
+          backgroundColor: '#009B4A',
+          hoverBackgroundColor: '#009B4A',
+          categoryPercentage: 0.66,
+        },
+      ],
+    }
+  )
+  
+  useEffect(() => {
+    // Actualizar las etiquetas cuando orderSelected.aufnr cambie
+    console.log("Cambió")
+    const newOrder = orderSelected.aufnr;
+    console.log(newOrder);
+    //setChartData();
+    
+    console.log("New chartData")
+    console.log(chartData)
+  }, [orderSelected]);
+
+
 
   const stepsUnion = [
     {
@@ -261,13 +321,8 @@ function GenealogyDashboard() {
       color: "white",
     }),
   };
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     localStorage.removeItem("b-gantt-trial-start");
-  //     window.location.reload();
-  //   }, 60000);
-
-  // }, []);
+  
+  
 
   function handleStepClickUnion(step, stepIndex) {
     if (stepIndex === 0) {
@@ -288,6 +343,12 @@ function GenealogyDashboard() {
     dispatch(setGlobalStatus(""));
     dispatch(setTestResults([]));
     dispatch(setComponentsJoined(false));
+    const handleNewEvent = {
+      text:
+        "Comando NUEVO detectado. Proceso reiniciado." ,
+      timestamp: new Date().toISOString(),
+    };
+    dispatch(addEventToGenealogyLog(handleNewEvent));
   }
 
   function buildTreeData(obj) {
@@ -319,6 +380,7 @@ function GenealogyDashboard() {
   function handleConfirmUnion(e) {
     e.stopPropagation();
     const payload = {
+      order: orderSelected.aufnr,
       condenser_unit_serial: barcodeCondenser,
       condenser_material_code: orderSelected.matnr.slice(-9),
       condenser_status_test: globalStatus === 1 ? true : false,
@@ -501,7 +563,28 @@ function GenealogyDashboard() {
                     <div className="flex items-center">
                       <Category className="mr-2" color="#A0A2A6" size={20} />
                       <h3 className="bg-white text-md font-medium text-gray">
-                        Número serial actual
+                        Compresor
+                      </h3>
+                    </div>
+
+                    <p className="bg-white text-3xl font-bold text-black">
+                      {Object.keys(orderSelected).length === 0
+                        ? "--------"
+                        : barcodeProduct}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/3 sm:my-4">
+              <div className="bg-white p-5">
+                <div className="sm:flex sm:items-start bg-white">
+                  <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
+                    <div className="flex items-center">
+                      <Category className="mr-2" color="#A0A2A6" size={20} />
+                      <h3 className="bg-white text-md font-medium text-gray">
+                        Condensador
                       </h3>
                     </div>
 
@@ -543,7 +626,7 @@ function GenealogyDashboard() {
               </div>
             </section>
 
-            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/4 sm:my-4">
+            {/* <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/6 sm:my-4">
               <div className="bg-white p-5">
                 <div className="sm:flex sm:items-start bg-white">
                   <div className="bg-white text-center sm:mt-0 sm:ml-2 sm:text-left">
@@ -561,7 +644,7 @@ function GenealogyDashboard() {
                   </div>
                 </div>
               </div>
-            </section>
+            </section> */}
 
             <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/6 sm:my-4">
               <div className="bg-white p-5">
@@ -576,7 +659,7 @@ function GenealogyDashboard() {
                     <p className="bg-white text-3xl font-bold text-black">
                       {Object.keys(orderSelected).length === 0
                         ? "--------"
-                        : `${orderSelected.qtdpl}`}
+                        : `${componentsCount}`}
                     </p>
                   </div>
                 </div>
@@ -679,6 +762,56 @@ function GenealogyDashboard() {
                     buildTreeData(orderSelected).map((node) => renderNode(node))
                   )}
                 </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div className="max-w-full mx-4 py-0 sm:mx-auto sm:px-6 lg:px-4">
+          <div className="sm:flex sm:space-x-4">
+            <section
+              style={{ height: "385px", overflowY: "scroll" }}
+              className="inline-block align-bottom rounded-lg border border-slate-200 text-left mb-4 w-full sm:w-2/3 sm:my-4"
+            >
+              <div className="bg-white p-5">
+                <h3 className="bg-white text-md font-medium text-gray">
+                  Historial
+                </h3>
+                <div
+                  className="bg-white text-sm text-black"
+                  style={{ maxHeight: "500px", overflowY: "auto" }}
+                >
+                  <ComponentsTable/>
+                  {/* {genealogyLog
+                    .slice()
+                    .reverse()
+                    .map((event, index, array) => (
+                      <p
+                        key={index}
+                        style={{ fontWeight: index === 0 ? "bold" : "normal" }}
+                      >
+                        <span style={{ color: "green" }}>
+                          {formatTimestampToDDMMYYYYHHMMSS(event.timestamp)}
+                        </span>{" "}
+                        - {event.text}{" "}
+                      </p>
+                    ))} */}
+                </div>
+              </div>
+            </section>
+
+            <section className="inline-block align-bottom rounded-lg border border-slate-200 text-left overflow-hidden mb-4 w-full sm:w-1/2 sm:my-4">
+              <div className="bg-white p-5">
+                <h3 className="bg-white text-md font-medium text-gray">
+                  Progreso de la órden
+                </h3>
+                <p className="bg-white text-3xl font-bold text-black">
+                {Object.keys(orderSelected).length === 0
+                        ? "--------"
+                        : <BarChart04 order={orderSelected} completed={componentsCount} width={595} height={248} />}
+          
+                </p>
+               
               </div>
             </section>
           </div>

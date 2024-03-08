@@ -251,6 +251,12 @@ function PaletizationView() {
     dispatch(setTestResults([]));
     dispatch(setComponentsJoined(false));
     dispatch(setComponents([]));
+    const handleNewEvent = {
+      text:
+        "Comando NUEVO detectado. Proceso reiniciado." ,
+      timestamp: new Date().toISOString(),
+    };
+    dispatch(addEventToGenealogyLog(handleNewEvent));
   }
 
   function handleNotify() {

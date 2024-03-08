@@ -5,6 +5,7 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 
 import "./css/style.scss";
+import './charts/ChartjsConfig';
 
 import Dashboard from "./pages/Dashboard";
 import PalatizationDashboard from "./pages/PaletizationDashboard";
