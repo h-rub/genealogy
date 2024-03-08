@@ -95,8 +95,11 @@ function GenealogyDashboard() {
   useScanDetection({
     onComplete: (code) => {
       console.log(mode);
+      console.log(code.replace(/Shift/g, "").toUpperCase())
       if(code.replace(/Shift/g, "").toUpperCase() === "NEW"){
+        console.log("Comando NEW detectado")
         handleNew();
+        return
       }
       if (mode === "compressor") {
         console.log(code);

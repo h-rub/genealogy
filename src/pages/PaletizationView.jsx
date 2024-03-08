@@ -95,6 +95,7 @@ function PaletizationView() {
       console.log(code);
       if(code.replace(/Shift/g, "").toUpperCase() === "NEW"){
         handleNew();
+        return;
       }
       if (code.replace(/Shift/g, "").length >= 11) {
         // Si la cadena tiene al menos 9 caracteres, considerarla un ID de producto
